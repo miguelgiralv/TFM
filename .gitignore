@@ -47,11 +47,16 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Ignora los archivos de la carpeta data
-data/    
+# ignora carpeta data
+data/
 
-# Ignora los archivos de la carpeta test
+# ignora carpeta test
 test/
+
+# ignora carpeta software
+software/
+
+.venv/
 
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode
