@@ -28,8 +28,6 @@ gpl@header$data_row_count
 length(gpl@header$sample_id)
 
 
-gpl@header
-
 # Exploramos ahora una muestra para ver las variables que contiene el experimento:
 gsm <- getGEO("GSM895465")
 
@@ -40,4 +38,5 @@ gsm@header$characteristics_ch1
 
 # Vemos además la tabla con los datos deque tiene cada muestra:
 head(Table(gsm))
+
 

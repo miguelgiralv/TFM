@@ -1,0 +1,322 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Explore\_GSE},
+  pdfauthor={Miguel G.A.},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Explore\_GSE}
+\author{Miguel G.A.}
+\date{2024-03-25}
+
+\begin{document}
+\maketitle
+
+\hypertarget{r-markdown}{%
+\subsection{R Markdown}\label{r-markdown}}
+
+Analizamos el GPL para obtener datos sobre el experimento:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gpl }\OtherTok{\textless{}{-}} \FunctionTok{getGEO}\NormalTok{(}\StringTok{"GPL14932"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in grep(pattern, bfr, value = TRUE): unable to translate ' El n<a3>mero
+## de serie del volumen es: 5E91-15C7' to a wide string
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in grep(pattern, bfr, value = TRUE): input string 2 is invalid
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in grep(pattern, bfr, value = TRUE): unable to translate ' El n<a3>mero
+## de serie del volumen es: 5E91-15C7' to a wide string
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in grep(pattern, bfr, value = TRUE): input string 2 is invalid
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in grep(pattern, bfr, value = TRUE): unable to translate ' El n<a3>mero
+## de serie del volumen es: 5E91-15C7' to a wide string
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in grep(pattern, bfr, value = TRUE): input string 2 is invalid
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(gpl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Formal class 'GPL' [package "GEOquery"] with 2 slots
+##   ..@ dataTable:Formal class 'GEODataTable' [package "GEOquery"] with 2 slots
+##   .. .. ..@ columns:'data.frame':    16 obs. of  2 variables:
+##   .. .. .. ..$ Column     : chr [1:16] "ID" "" "" "SNP_ID" ...
+##   .. .. .. ..$ Description: chr [1:16] "IlmnID" "Name =" "IlmnStrand =" "ncbi SNP accession LINK_PRE:\"http://www.ncbi.nlm.nih.gov/snp/?term=\"" ...
+##   .. .. ..@ table  :'data.frame':    662841 obs. of  16 variables:
+##   .. .. .. ..$ ID              : chr [1:662841] "MitoA10045G-gi13273284_B_R_IFB1141652022:" "MitoA10551G-gi13273286_T_F_IFB1141639111:" "MitoA11252G-gi13273288_B_R_IFB1141661584:" "MitoA11468G-gi13273289_B_R_IFB1141719645:" ...
+##   .. .. .. ..$ Name            : chr [1:662841] "MitoA10045G" "MitoA10551G" "MitoA11252G" "MitoA11468G" ...
+##   .. .. .. ..$ IlmnStrand      : chr [1:662841] "Bot" "Top" "Bot" "Bot" ...
+##   .. .. .. ..$ SNP_ID          : chr [1:662841] "[T/C]" "[A/G]" "[T/C]" "[T/C]" ...
+##   .. .. .. ..$ AddressA_ID     : int [1:662841] 904860368 905860131 903990168 901990681 904780630 906590470 901740201 901470575 905910687 906940170 ...
+##   .. .. .. ..$ AlleleA_ProbeSeq: logi [1:662841] NA NA NA NA NA NA ...
+##   .. .. .. ..$ AddressB_ID     : int [1:662841] 0 0 0 0 0 0 0 0 0 0 ...
+##   .. .. .. ..$ AlleleB_ProbeSeq: logi [1:662841] NA NA NA NA NA NA ...
+##   .. .. .. ..$ Chr             : chr [1:662841] "M" "M" "M" "M" ...
+##   .. .. .. ..$ MapInfo         : int [1:662841] 10045 10551 11252 11468 11813 12309 13106 13264 13781 14234 ...
+##   .. .. .. ..$ Ploidy          : chr [1:662841] "1000" "1000" "1000" "1000" ...
+##   .. .. .. ..$ Species         : chr [1:662841] "Homo sapiens" "Homo sapiens" "Homo sapiens" "Homo sapiens" ...
+##   .. .. .. ..$ CustomerStrand  : chr [1:662841] "Top" "Top" "Top" "Top" ...
+##   .. .. .. ..$ IlmnStrand      : chr [1:662841] "Bot" "Top" "Bot" "Bot" ...
+##   .. .. .. ..$ IllumicodeSeq   : logi [1:662841] NA NA NA NA NA NA ...
+##   .. .. .. ..$ TopGenomicSeq   : logi [1:662841] NA NA NA NA NA NA ...
+##   ..@ header   :List of 25
+##   .. ..$ contact_address        : chr "6 Queen’s Park Crescent West"
+##   .. ..$ contact_city           : chr "Toronto"
+##   .. ..$ contact_country        : chr "Canada"
+##   .. ..$ contact_email          : chr "ekaterina.rogaeva@utoronto.ca"
+##   .. ..$ contact_fax            : chr "(416)-978-1878"
+##   .. ..$ contact_institute      : chr "Tanz Centre for Neurodegenerative Diseases"
+##   .. ..$ contact_name           : chr "Ekaterina,,Rogaeva"
+##   .. ..$ contact_phone          : chr "(416) 946-7927"
+##   .. ..$ contact_zip/postal_code: chr "M5S 3H2"
+##   .. ..$ data_row_count         : chr "662841"
+##   .. ..$ description            : chr [1:3] "Descriptor File Name(s),HumanHap650Y_v2-0_GenotypingBC_11237679_A.bpm" "Assay Format,Infinium II" "SNP Count,662841"
+##   .. ..$ distribution           : chr "custom-commercial"
+##   .. ..$ geo_accession          : chr "GPL14932"
+##   .. ..$ last_update_date       : chr "May 01 2012"
+##   .. ..$ manufacture_protocol   : chr "See manufacturer's website"
+##   .. ..$ manufacturer           : chr "Illumina, Inc."
+##   .. ..$ organism               : chr "Homo sapiens"
+##   .. ..$ sample_id              : chr [1:1215] "GSM894502" "GSM894503" "GSM894504" "GSM894505" ...
+##   .. ..$ series_id              : chr "GSE33528"
+##   .. ..$ status                 : chr "Public on May 01 2012"
+##   .. ..$ submission_date        : chr "Nov 26 2011"
+##   .. ..$ supplementary_file     : chr "ftp://ftp.ncbi.nlm.nih.gov/geo/platforms/GPL14nnn/GPL14932/suppl/GPL14932_Mahdi_650Yv2_manifest.csv.gz"
+##   .. ..$ taxid                  : chr "9606"
+##   .. ..$ technology             : chr "oligonucleotide beads"
+##   .. ..$ title                  : chr "Illumina HumanHap650Yv2 Genotyping BeadChip (HumanHap650Y_v2-0_GenotypingBC_11237679_A)"
+\end{verbatim}
+
+@dataTable contiene toda la informacion sobre la tabla de variantes del
+chip. Dentro hay dos objetos @columns (que contiene información sobre
+las columnas del chip) y @table que contiene los datos de las variantes
+del chip:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tabla\_datos\_gpl}\OtherTok{\textless{}{-}}\NormalTok{gpl}\SpecialCharTok{@}\NormalTok{dataTable}
+\NormalTok{table\_gpl}\OtherTok{\textless{}{-}}\NormalTok{(tabla\_datos\_gpl}\SpecialCharTok{@}\NormalTok{table)}
+\FunctionTok{head}\NormalTok{(table\_gpl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                          ID        Name IlmnStrand SNP_ID
+## 1 MitoA10045G-gi13273284_B_R_IFB1141652022: MitoA10045G        Bot  [T/C]
+## 2 MitoA10551G-gi13273286_T_F_IFB1141639111: MitoA10551G        Top  [A/G]
+## 3 MitoA11252G-gi13273288_B_R_IFB1141661584: MitoA11252G        Bot  [T/C]
+## 4 MitoA11468G-gi13273289_B_R_IFB1141719645: MitoA11468G        Bot  [T/C]
+## 5 MitoA11813G-gi13273292_T_F_IFB1141667833: MitoA11813G        Top  [A/G]
+## 6 MitoA12309G-gi13273294_T_F_IFB1141664161: MitoA12309G        Top  [A/G]
+##   AddressA_ID AlleleA_ProbeSeq AddressB_ID AlleleB_ProbeSeq Chr MapInfo Ploidy
+## 1   904860368               NA           0               NA   M   10045   1000
+## 2   905860131               NA           0               NA   M   10551   1000
+## 3   903990168               NA           0               NA   M   11252   1000
+## 4   901990681               NA           0               NA   M   11468   1000
+## 5   904780630               NA           0               NA   M   11813   1000
+## 6   906590470               NA           0               NA   M   12309   1000
+##        Species CustomerStrand IlmnStrand IllumicodeSeq TopGenomicSeq
+## 1 Homo sapiens            Top        Bot            NA            NA
+## 2 Homo sapiens            Top        Top            NA            NA
+## 3 Homo sapiens            Top        Bot            NA            NA
+## 4 Homo sapiens            Top        Bot            NA            NA
+## 5 Homo sapiens            Top        Top            NA            NA
+## 6 Homo sapiens            Top        Top            NA            NA
+\end{verbatim}
+
+El número de filas de este df es el numero de variantes del array:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(table\_gpl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 662841
+\end{verbatim}
+
+Tambien podemos verlo en el objeto @header:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gpl}\SpecialCharTok{@}\NormalTok{header}\SpecialCharTok{$}\NormalTok{data\_row\_count}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "662841"
+\end{verbatim}
+
+Comprobamos el número de individuos (muestras) del experimento:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{length}\NormalTok{(gpl}\SpecialCharTok{@}\NormalTok{header}\SpecialCharTok{$}\NormalTok{sample\_id)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1215
+\end{verbatim}
+
+Exploramos ahora una muestra para ver las variables que contiene el
+experimento:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gsm }\OtherTok{\textless{}{-}} \FunctionTok{getGEO}\NormalTok{(}\StringTok{"GSM895465"}\NormalTok{)}
+\NormalTok{gsm}\SpecialCharTok{@}\NormalTok{header}\SpecialCharTok{$}\NormalTok{characteristics\_ch1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "qc status: Failed QC" "cell type: Blood"     "disease status: AD"
+\end{verbatim}
+
+Esta muestra era de sangre y el individuo tenía alzheimer
+
+Vemos además la tabla con los datos que tiene cada muestra:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(}\FunctionTok{Table}\NormalTok{(gsm))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                      ID_REF Allele1-Top Allele2-Top  Score
+## 1 MitoA10045G-gi13273284_B_R_IFB1141652022:           A           A 0.3070
+## 2 MitoA10551G-gi13273286_T_F_IFB1141639111:           A           A 0.3113
+## 3 MitoA11252G-gi13273288_B_R_IFB1141661584:           A           A 0.7245
+## 4 MitoA11468G-gi13273289_B_R_IFB1141719645:           A           A 0.3510
+## 5 MitoA11813G-gi13273292_T_F_IFB1141667833:           A           A 0.5721
+## 6 MitoA12309G-gi13273294_T_F_IFB1141664161:           A           A 0.6480
+##   Theta     R B Allele Freq  VALUE
+## 1 0.000 6.678             0 0.8744
+## 2 0.007 7.450             0 1.1457
+## 3 0.011 6.636             0 0.8919
+## 4 0.003 9.025             0 0.4972
+## 5 0.026 7.897             0 1.0520
+## 6 0.007 7.181             0 1.0365
+\end{verbatim}
+
+\end{document}
