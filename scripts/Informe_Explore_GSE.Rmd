@@ -3,13 +3,13 @@ title: "Explore_GSE"
 author: "Miguel G.A."
 date: "2024-03-25"
 output:
-  html_document: default
-  pdf_document: default
+  rmarkdown::github_document
+
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-rmarkdown::github_document
+
 library(GEOquery)
 library(knitr)
 ```
