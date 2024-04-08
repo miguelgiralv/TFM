@@ -1,0 +1,100 @@
+---
+title: "Explore_GSE"
+author: "Miguel G.A."
+date: "2024-04-08"
+output:
+  rmarkdown::github_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(GEOquery)
+library(knitr)
+```
+
+## R Markdown
+
+Analizamos el GSE para obtener datos sobre el experimento:
+
+```{r gpl_load}
+gse <- getGEO("GSE781")
+
+# la sección de metadatos es:
+metadata_gse<-gse@header
+metadata_gse
+
+```
+
+La información sobre el número de variantes estará que se genotiparon la podemos encontrar 
+en la información de las plataformas de genotipado (puede ser una o varias): 
+
+Podemos ver el número de plataformas que hay:
+
+```{r load data_table}
+
+length(metadata_gse$platform_id)
+
+metadata_gse$platform_id
+
+
+```
+
+Y podemos averiguar el número de variables totales del GSE en base a las plataformas usadas:
+
+```{r load data_table}
+
+sumatorio<-0
+
+for (i in metadata_gse$platform_id) 
+{
+  gpl <- getGEO(i)
+  gpl_variables_number<-nrow(gpl@dataTable@table)
+  sumatorio<-sumatorio + gpl_variables_number
+  
+}
+print(sumatorio)
+
+```
+
+Podemos también ver el número de muestras del experimento: 
+
+```{r load data_table}
+length(metadata_gse$sample_id)
+
+```
+
+Ahora veremos la información de muestras individuales para ver qué información hay sobre otras variables fenotipicas viendo los metadatos de la muestra: 
+
+```{r load data_table}
+gsm <- getGEO("GSM895465")
+gsm@header
+
+```
+Vemos que hay varios metadatos interesantes tales como el tejido del que se extrajo el DNA ($source_name_ch1), 
+también vemos en $characteristics_ch1 si el individuo tiene alzheimer y sí la muestra pasó el control de calidad.
+
+Comprobamos el número de individuos (muestras) del experimento:
+
+```{r Numero de individuos}
+
+
+
+```
+
+Exploramos ahora una muestra para ver las variables que contiene el experimento:
+
+```{r Sample variables}
+gsm <- getGEO("GSM895465")
+gsm@header$characteristics_ch1
+
+```
+Esta muestra era de sangre y el individuo tenía alzheimer
+
+Vemos además la tabla con los datos que tiene cada muestra:
+```{r Sample data}
+head(Table(gsm))
+```
+
+

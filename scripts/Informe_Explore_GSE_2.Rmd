@@ -1,0 +1,70 @@
+---
+title: "Explore_GSE"
+author: "Miguel G.A."
+date: "2024-03-25"
+output:
+  rmarkdown::github_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(GEOquery)
+library(knitr)
+```
+
+## R Markdown
+
+Analizamos el GPL para obtener datos sobre el experimento:
+
+```{r gpl_load}
+gpl <- getGEO("GPL14932")
+
+str(gpl)
+
+```
+@dataTable contiene toda la informacion sobre la tabla de variantes del chip.
+Dentro hay dos objetos @columns (que contiene información sobre las columnas del chip) y @table que contiene los datos de las variantes del chip: 
+
+
+```{r load data_table}
+tabla_datos_gpl<-gpl@dataTable
+table_gpl<-(tabla_datos_gpl@table)
+head(table_gpl)
+```
+
+
+El número de filas de este df es el numero de variantes del array:
+
+```{r Numero de variantes}
+nrow(table_gpl)
+```
+Tambien podemos verlo en el objeto @header:
+```{r Numero de variantes header}
+gpl@header$data_row_count
+
+```
+
+
+Comprobamos el número de individuos (muestras) del experimento:
+
+```{r Numero de individuos}
+length(gpl@header$sample_id)
+
+```
+Exploramos ahora una muestra para ver las variables que contiene el experimento:
+
+```{r Sample variables}
+gsm <- getGEO("GSM895465")
+gsm@header$characteristics_ch1
+
+```
+Esta muestra era de sangre y el individuo tenía alzheimer
+
+Vemos además la tabla con los datos que tiene cada muestra:
+```{r Sample data}
+head(Table(gsm))
+```
+
+
