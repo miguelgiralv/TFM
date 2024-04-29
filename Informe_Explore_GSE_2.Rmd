@@ -18,12 +18,16 @@ library(knitr)
 
 Analizamos el GSE para obtener datos sobre el experimento:
 
+NO USAR LAS @
+
+
+
 ```{r gpl_load}
 gse <- getGEO("GSE781")
 
 # la sección de metadatos es:
-metadata_gse<-gse@header
-metadata_gse
+metadata_gse<-Meta(gse)
+print(metadata_gse)
 
 ```
 
@@ -72,6 +76,11 @@ gsm <- getGEO("GSM895465")
 gsm@header
 
 ```
+% de muestras QC, AD/control
+
+% sexo (una vez tenga lo de Plink)
+
+
 Vemos que hay varios metadatos interesantes tales como el tejido del que se extrajo el DNA ($source_name_ch1), 
 también vemos en $characteristics_ch1 si el individuo tiene alzheimer y sí la muestra pasó el control de calidad.
 
@@ -87,7 +96,7 @@ Exploramos ahora una muestra para ver las variables que contiene el experimento:
 
 ```{r Sample variables}
 gsm <- getGEO("GSM895465")
-gsm@header$characteristics_ch1
+gsm@header
 
 ```
 Esta muestra era de sangre y el individuo tenía alzheimer

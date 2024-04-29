@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(GEOquery)
 library(knitr)
+
 ```
 
 ## R Markdown
@@ -21,7 +22,12 @@ Analizamos el GPL para obtener datos sobre el experimento:
 ```{r gpl_load}
 gpl <- getGEO("GPL14932")
 
-str(gpl)
+gsm<-getGEO("GSM894506")
+
+Meta(gsm)
+
+
+
 
 ```
 @dataTable contiene toda la informacion sobre la tabla de variantes del chip.
