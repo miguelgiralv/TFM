@@ -6,7 +6,19 @@ import subprocess
 merged_metadata = pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", sep="\t")
 # La vemos
 merged_metadata
-# Vemos el número de individuos que tenemos primero en el archivo de plink binario
+# Vemos como eran los fenotipos antes de realizar ningún análisis de calidad (solo tabla de metadatos) y archivo plink con sexo
+
+
+# Vemos como son ahora los fenotipos tras realizar el análisis de calidad: 
+#
+#lista de muestras en plink, cotegar con la tabla de metadatos y sacar sexo en plink
+
+
+
+
+
+# 
+# el número de individuos que tenemos primero en el archivo de plink binario
 plink_command=["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
 "--bfile",
 "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
@@ -51,7 +63,7 @@ plink_command=["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TF
 "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
 "--freq"]  
 subprocess.run(plink_command)
-plink --file your_data --check-sex --out sex_check_results
+
 
 
 

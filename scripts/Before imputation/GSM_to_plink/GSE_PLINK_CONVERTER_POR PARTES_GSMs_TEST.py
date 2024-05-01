@@ -66,13 +66,12 @@ def GSM_to_plink (gsm_inicial, gsm_final):
 ###########################################
 
 # Generamos el archivo map
-gpl = GEOparse.get_GEO('GPL14932',
-                           destdir="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/GEO")
+gpl = GEOparse.get_GEO('GPL14932',destdir="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/GEO")
 selected_columns = ["Chr","Name", "MapInfo"]
 map_table = gpl.table[selected_columns]
 map_table["position"] = 0
 order_columns= ["Chr","Name","position","MapInfo"]
-map_table.loc[:,order_columns].to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/GEO/GSE33528_2.map", sep='\t', index=False, header=False)
+map_table.loc[:,order_columns].to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.map", sep='\t', index=False, header=False)
 
 ###########################################
 
@@ -95,8 +94,7 @@ GSM_to_plink(895576, 895676).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MAS
 GSM_to_plink(895677, 895768).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_11.ped", index=False, header=False, sep="\t")
 
 ###########################################
-
-# Unimos todos los ped en uno:
+# Ahora uniremos todos los ped en uno solo:
 def merge_ped_files(input_files, output_file):
     # Abrimos el output file en modo append
     with open(output_file, "a") as outfile:
@@ -105,46 +103,36 @@ def merge_ped_files(input_files, output_file):
             with open(input_file, "r") as infile:
                 # escribimos cada linea del inputfile en el output file
                 for line in infile:
-                    outfile.write(line)
+                    # Dividimos las lineas en campo
+                    fields = line.split()
+                    # Iteramos los campos y sustitoumos las variantes faltantes que están como "-"" por 0 
+                    # (para que podamos convertir el archivo a binario de plink)
+                    for i in range(len(fields)):
+                        if fields[i] == "-":
+                            fields[i] = "0"
+                    # Escribimos la linea modificada en el archivo de salida
+                    outfile.write("\t".join(fields) + "\n")
 # Creamos la lista de archivos que fusionar
 input_files = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_1.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_2.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_3.ped","C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_4.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_4_2.ped", 
                "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_5.ped","C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_6.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_7.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_8.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_9.ped", 
                "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_10.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_11.ped"]
 
 # Creamos la ruta del archivo de output
-output_file = "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/merged_ped_file.ped"
+output_file = "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.ped"
 
-# Ejecutamos
+# Ejecutamos la funcion para fusionar los ped
 merge_ped_files(input_files, output_file)
-###########################################
-# Cambiamos los "-" en las variantes faltantes por "0" para que no de error convertir a plink binario:
-with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/merged_ped_file.ped", "r") as infile, open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.ped", "w") as outfile:
-    # Recorremos todas las linas
-    for line in infile:
-        # Dividimos las lineas en campo 
-        fields = line.split()
-        # Iteramos los campos y sustitoumos - por 0
-        for i in range(len(fields)):
-            if fields[i] == "-":
-                fields[i] = "0"
-        # Escribimos la linea modificada en el archivo nuevo
-        outfile.write("\t".join(fields) + "\n")
-        
-###########################################
+
 # comprobamos que el numero de muestras coincide con las muestras contando las lineas:
 with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.ped", 'r') as file:
     line_count = sum(1 for line in file)
 print(line_count)
 # coincide!
 
-# a continuación debemos realizar el mapeo de hg18 a hg38, una vez hecho, generamos el plink binario mapeado:
-# Tras esto, ejecutamos en plink en el directorio donde esta el ped y map para generar el plink binario:
+# a continuación debemos realizar el mapeo de hg18 a hg38, una vez hecho, generamos el plink binario mapeado con los archivos map y ped mapeados (output_map):
 plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
-"--file",
-"C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528",
-"--make-bed",
-"--out",
-"C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528"]
+"--file", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/processed/output_map",
+"--allow-extra-chr", "--make-bed", "--out", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528"]
 
 subprocess.run(plink_command)
 

@@ -1,5 +1,5 @@
 import pandas as pd
-
+import subprocess
 
 #######################################################
 # Primero hacemos un recuento de individuos a lo largo de todo el análisis:
@@ -14,7 +14,6 @@ qc_failed_ids = qc_failed_ids[['Family_id', 'Individual ID']]
 # lo almacenamos en un txt
 qc_failed_ids.to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/qc_failed_ids.txt", sep="\t", index=False, header=False, lineterminator="\n")
 # ahora ejecutamos plink para eliminar las muestras que fallaron el test de calidad y que hemos almacenado en qc_failed_ids.txt
-import subprocess
 # el comando es:
 plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink.exe",
 "--bfile", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528", 
@@ -29,10 +28,6 @@ with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Rep
 with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_qc.fam", "r") as file:
     row_count_qc_despues = len(file.readlines())   
 
-print("Antes de hacer descartar los individuos con muestras de baja calidad según los metadatos, teníamos", row_count_qc_antes, "individuos.","\n",
-"Tras el análisis de calidad inicial, nos quedamos con", row_count_qc_despues, "individuos.","\n",
-"Hemos eliminado", row_count_qc_antes-row_count_qc_despues, "individuos en el análisis de calidad de los metadatos.")
-
 # Ahora seleccionamos ahora los individuos con buena calidad en base al call-rate de individuos (comando --mind)
 plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink.exe",
 "--bfile", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_qc", 
@@ -45,7 +40,6 @@ with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Rep
     row_count_qc_in_despues = len(file.readlines())   
 
 # Y resumimos toda la información:
-
 print("Antes de descartar los individuos con muestras de baja calidad según los metadatos, teníamos", row_count_qc_antes, "individuos.","\n",
 "Tras el análisis de calidad inicial, nos quedamos con", row_count_qc_despues, "individuos.","\n",
 "Hemos descartado", row_count_qc_antes-row_count_qc_despues, "individuos en el análisis de calidad de los metadatos.","\n","\n",
@@ -82,3 +76,4 @@ print("Antes de mapear el genoma de referencia teníamos", row_count_var_map_ant
 "Tras el análisis de calidad en base al call-rate, nos quedamos con", row_count_var_cr_despues, "variantes.","\n",
 "Hemos eliminado", row_count_var_map_despues-row_count_var_cr_despues, "variantes.","\n","\n",
 "En total se han descartado", row_count_var_map_antes-row_count_var_cr_despues,"variantes")
+
