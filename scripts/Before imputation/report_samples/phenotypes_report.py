@@ -1,73 +1,42 @@
+
 import pandas as pd
-import subprocess
-
-######################################################################
-# Cargamos la tabla de fenotipos que hemos creado con los metadatos 
-merged_metadata = pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", sep="\t")
+# Cargamos la tabla de fenotipos que hemos creado (en metadata_table_generate) con los metadatos 
+metadata = pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", sep="\t")
 # La vemos
-merged_metadata
-# Vemos como eran los fenotipos antes de realizar ningún análisis de calidad (solo tabla de metadatos) y archivo plink con sexo
+metadata
 
+# Observamos las características fenotípicas antes de hacer el análisis de calidad 
+n_total=metadata.shape[0]
+n_qc_passed=sum(metadata["QC"]=="Passed")
+n_qc_failed=sum(metadata["QC"]=="Failed")
+n_AD=sum(metadata["Disease status"]=="AD")
+n_control=sum(metadata["Disease status"]=="control")
+n_unknown=sum(metadata["Disease status"]=="unknown")
+n_male=sum(metadata["Sex"]=="male")
+n_female=sum(metadata["Sex"]=="female")
+# y hacemos un recuento:
+print(" En un inicio tenemos",n_total, "individuos,","de los cuales" "\033[92m",n_AD,"\033[0m", "tienen Alzheimer,","\033[33m", n_control, "\033[0m" "son individuos control y", 
+"\033[91m", n_unknown, "\033[0m","son individuos con fenotipo desconocido.\n","De estos,", n_male,"son hombres y", n_female, "son mujeres.\n Por otro lado","\033[92m", n_qc_passed, "\033[0m","de las muestras pasaron el control de calidad y",
+"\033[91m", n_qc_failed, "\033[0m","de las no lo pasaron")
 
-# Vemos como son ahora los fenotipos tras realizar el análisis de calidad: 
-#
-#lista de muestras en plink, cotegar con la tabla de metadatos y sacar sexo en plink
+# tras realizar todos los análisis de calidad, hemos descartado varias muestras, así que ahora veremos las características fenotípicas de estas muestras procesadas
+# Primero obtenemos el df que contiene a los individuos con los que nos hemos quedado despues de todos los análisis de calidad (en el archivo fam):
+fam_df=pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_final.fam",
+names=["fam_id", "Individual ID", "1","2", "3","4"], sep="\s+")
+# cogemos los individuos que han pasado los análisis de calidad con set
+individual_ids = set(fam_df['Individual ID'])
+# y filtramos en nuestra tabla de metadatos:
+metadata_qc = metadata[metadata['Individual ID'].isin(individual_ids)]
 
-
-
-
-
-# 
-# el número de individuos que tenemos primero en el archivo de plink binario
-plink_command=["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
-"--bfile",
-"C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
-"--freq"]  
-subprocess.run(plink_command)
-
-# comprobamos la consistencia de nuestro metodo de asignación de sexo con el comando --check-sex de plink:
-plink_command = [
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
-    "--bfile",
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
-    "--check-sex",
-    "--out",
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results"
-]
-subprocess.run(plink_command)
-# abrimos el archivo generado y vemos la consistencia del sexo
-sex_consistency=pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results.sexcheck", sep="\s+")
-sex_ok = sex_consistency[sex_consistency['STATUS'] == 'OK'].shape[0]
-sex_problem = sex_consistency[sex_consistency['STATUS'] == 'PROBLEM'].shape[0]
-print(sex_ok,"individuos concuerdan con nuestro método,", sex_problem,"individuos no concuerdan con la predicción de plink")
-# para arreglar estos 43 individuos, vamos a ejecutar --check-sex pero con parámetros un poco mas laxos:
-
-
-# Cargamos la tabla de fenotipos que hemos creado con los metadatos 
-merged_metadata = pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", sep="\t")
-# Comprobamos que las dimensiones coinciden con el número de muestras
-merged_metadata
-# Vemos los distintos fenotipos en base a los metadatos:
-control_count = merged_metadata[merged_metadata['Disease status'] == 'control'].shape[0]
-AD_count = merged_metadata[merged_metadata['Disease status'] == 'AD'].shape[0]
-unknown_count = merged_metadata[merged_metadata['Disease status'] == 'unknown'].shape[0]
-qc_failed = merged_metadata[merged_metadata['QC'] == 'Failed'].shape[0]
-qc_pass = merged_metadata[merged_metadata['QC'] == 'Passed'].shape[0]
-# Y hacemos un recuento 
-print("Tenemos", "\033[92m", AD_count,"\033[0m", "individuos con Alzheimer,","\033[33m", control_count, "\033[0m" "individuos control y", "\033[91m", unknown_count, 
-"\033[0m","individuos con fenotipo desconocido.\n", "Por otro lado","\033[92m", qc_pass, "\033[0m","de las muestras pasaron el control de calidad y",
-"\033[91m", qc_failed, "\033[0m","muestras fallaron el control de calidad")
- 
-plink_command=["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
-"--bfile",
-"C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
-"--freq"]  
-subprocess.run(plink_command)
-
-
-
-
-
-
-
-
+# y ahora resumimos los fenotipos resultantes:
+n_total_qc=metadata_qc.shape[0]
+n_qc_passed_qc=sum(metadata_qc["QC"]=="Passed")
+n_qc_failed_qc=sum(metadata_qc["QC"]=="Failed")
+n_AD_qc=sum(metadata_qc["Disease status"]=="AD")
+n_control_qc=sum(metadata_qc["Disease status"]=="control")
+n_unknown_qc=sum(metadata_qc["Disease status"]=="unknown")
+n_male_qc=sum(metadata_qc["Sex"]=="male")
+n_female_qc=sum(metadata_qc["Sex"]=="female")
+# y hacemos un recuento:
+print(" Tras el análisis de calidad, tenemos", n_total_qc, "individuos,","de los cuales" "\033[92m",n_AD_qc,"\033[0m", "tienen Alzheimer,","\033[33m", n_control_qc, "\033[0m" "son individuos control y", 
+"\033[91m", n_unknown_qc, "\033[0m","son individuos con fenotipo desconocido.\n","De nuestros individuos,", n_male_qc,"son hombres y", n_female_qc, "son mujeres")

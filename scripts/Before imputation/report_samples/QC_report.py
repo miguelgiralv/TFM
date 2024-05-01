@@ -7,7 +7,7 @@ import subprocess
 merged_metadata = pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", sep="\t")
 qc_failed=merged_metadata[merged_metadata["QC"]=="Failed"]
 #creamos un df con la lista de ids de muestras a eliminar y su family ID, que es siempre el mismo ()
-qc_failed_ids = qc_failed[["Individual ID"]]
+qc_failed_ids = qc_failed[["Individual ID"]].copy() 
 qc_failed_ids['Family_id'] = "GSE33528"
 # cambiamos el orden para que family_id sea la primera columna
 qc_failed_ids = qc_failed_ids[['Family_id', 'Individual ID']]
@@ -16,16 +16,17 @@ qc_failed_ids.to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMAT
 # ahora ejecutamos plink para eliminar las muestras que fallaron el test de calidad y que hemos almacenado en qc_failed_ids.txt
 # el comando es:
 plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink.exe",
-"--bfile", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528", 
+# Usamos el archivo de plink con los sexos corregidos (lo se hizo en el fichero Metadata_table_generate)
+"--bfile", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_sex", 
 "--remove", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/qc_failed_ids.txt","--allow-extra-chr", 
-"--make-bed", "--out", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_qc"]
+"--make-bed", "--out", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_sex_qc"]
 # Lo ejecutamos para obtener los nuevos archivos binarios excluyendo a las muestras que no pasaron la calidad
 subprocess.run(plink_command)
 # antes del qc:
-with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/output_GSE33528.fam", "r") as file:
+with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_sex.fam", "r") as file:
     row_count_qc_antes = len(file.readlines())    
 #y despues del qc:
-with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_qc.fam", "r") as file:
+with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_sex_qc.fam", "r") as file:
     row_count_qc_despues = len(file.readlines())   
 
 # Ahora seleccionamos ahora los individuos con buena calidad en base al call-rate de individuos (comando --mind)
@@ -40,7 +41,7 @@ with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Rep
     row_count_qc_in_despues = len(file.readlines())   
 
 # Y resumimos toda la información:
-print("Antes de descartar los individuos con muestras de baja calidad según los metadatos, teníamos", row_count_qc_antes, "individuos.","\n",
+print(" Antes de descartar los individuos con muestras de baja calidad según los metadatos, teníamos", row_count_qc_antes, "individuos.","\n",
 "Tras el análisis de calidad inicial, nos quedamos con", row_count_qc_despues, "individuos.","\n",
 "Hemos descartado", row_count_qc_antes-row_count_qc_despues, "individuos en el análisis de calidad de los metadatos.","\n","\n",
 "Tras el análisis de call-rate, nos quedamos con", row_count_qc_in_despues, "individuos.","\n",
@@ -76,4 +77,3 @@ print("Antes de mapear el genoma de referencia teníamos", row_count_var_map_ant
 "Tras el análisis de calidad en base al call-rate, nos quedamos con", row_count_var_cr_despues, "variantes.","\n",
 "Hemos eliminado", row_count_var_map_despues-row_count_var_cr_despues, "variantes.","\n","\n",
 "En total se han descartado", row_count_var_map_antes-row_count_var_cr_despues,"variantes")
-

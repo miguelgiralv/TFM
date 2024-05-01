@@ -136,4 +136,34 @@ plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/
 
 subprocess.run(plink_command)
 
+# Finalmente corregiremos el sexo de nuestro plink binario con la funcion check-sex:
+plink_command = [
+    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
+    "--bfile",
+    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
+    "--check-sex", 
+    "--allow-extra-chr",
+    "--out",
+    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results"
+]
+subprocess.run(plink_command)
+# Vemos como es la tabla sexcheck:
+check_sex=pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results.sexcheck", sep="\s+")
+check_sex.head()
+sex_ok = check_sex[check_sex['STATUS'] == 'OK'].shape[0]
+sex_problem = check_sex[check_sex['STATUS'] == 'PROBLEM'].shape[0]
+print(sex_ok,"individuos concuerdan con nuestro método,", sex_problem,"individuos no concuerdan con la predicción de plink")
+# Vemos que 43 individuos no concuerdan con nuestra prediccion de plink así que nos quedamos con la estimación de plink basada en la heterocigosidad
+# ya que es mas exacto que nuestro método. Aplicamos la predicción de plink a nuestro archivo plink binario con la funcion impute-sex para tener el sexo corregido:
+plink_command = [
+    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
+    "--bfile",
+    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
+    "--impute-sex",
+    "--allow-extra-chr",
+    "--make-bed",
+    "--out",
+    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_sex"
+]
+subprocess.run(plink_command)
 

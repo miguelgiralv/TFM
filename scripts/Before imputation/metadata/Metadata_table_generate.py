@@ -71,6 +71,20 @@ for column_name in merged_metadata.columns:
         merged_metadata=merged_metadata.drop(columns=column_name)
 # hemos eliminado cell type porque solo tiene un valor
 merged_metadata.head
+# a continuación añadimos el sexo a nuestra tabla de metadatos, para ello usaremos la tabla checksex que generamos
+# anteriormente al corregir el sexo con la funcion check-sex:
+check_sex=pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results.sexcheck", sep="\s+")
+check_sex.head()
+# armonizamos nombres en la columna de individuos de checksex 
+check_sex.rename(columns={'IID':'Individual ID'}, inplace=True)
+# y ahora fusionamos los dfs
+merged_df = pd.merge(merged_metadata, check_sex, on='Individual ID', how='inner')
+# nos quedamos con las columnas de interes
+merged_metadata = merged_df[['Individual ID', 'QC', 'Disease status', 'PEDSEX']]
+# cambiamos nombre de la columna sexo:
+merged_metadata.rename(columns={'PEDSEX':'Sex'}, inplace=True)
+# sustituimos los numeros por male y female
+merged_metadata['Sex'] = merged_metadata['Sex'].replace({1: 'male', 2: 'female'})
+
 # guardamos finalmente la tabla con metadatos:
 merged_metadata.to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", index=False, header=True, sep="\t")
-
