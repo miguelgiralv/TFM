@@ -16,7 +16,7 @@ qc_failed_ids = qc_failed_ids[['Family_id', 'Individual ID']]
 # lo almacenamos en un txt
 qc_failed_ids.to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/qc_failed_ids.txt", sep="\t", index=False, header=False, lineterminator="\n")
 
-# ahora ejecutaremos plink para eliminar las muestras que fallaron el test de calidad y que hemos almacenado en qc_failed_ids.txt (plink_QC.bat)
+# ahora ejecutaremos plink para eliminar las muestras que fallaron el test de calidad y que hemos almacenado en qc_failed_ids.txt 
 # el comando es:
 plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink.exe",
 "--bfile", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/output_GSE33528", 
