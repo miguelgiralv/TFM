@@ -61,6 +61,11 @@ results/
 
 .venv/
 
+# Ignorar archivos grandes
+plink.frq
+plink.hwe
+plink.list
+
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode
 

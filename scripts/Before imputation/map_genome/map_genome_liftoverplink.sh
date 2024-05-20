@@ -1,19 +1,18 @@
+# definimos los paths relativos:
+path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+work_dir="/home/miguel/liftover"
 
-# Copiaremos los archivos necesarios al directorio de wsl directamente ya que el codigo de liftoverPlink da problemas al tratar con paths de archivos con espacios en medio 
-cp "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.map" /home/miguel/liftover
-
-cp "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/liftOver" /home/miguel/liftover
-
-cp "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/liftOverPlink.py" /home/miguel/liftover
-
-cp "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.ped" /home/miguel/liftover
-
-cp "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/coordinate_map/hg18ToHg38.over.chain.gz" /home/miguel/liftover
+# Copiaremos los archivos necesarios al directorio de wsl directamente ya que el codigo de liftoverPlink da problemas al tratar con paths de archivos de windows con espacios en medio 
+cp "$path/results/plink_data/GSE33528.map" "$work_dir"
+cp "$path/software/liftOver" "$work_dir"
+cp "$path/software/liftOverPlink.py" "$work_dir"
+cp "$path/data/coordinate_map/hg18ToHg19.over.chain.gz" "$work_dir"
+mkdir results
 
 #ahora ejecutamos liftoverplink:
-python2 liftOverPlink.py -m /home/miguel/liftover/GSE33528.map -p /home/miguel/liftover/GSE33528.ped -o /home/miguel/liftover/results/output_map -c /home/miguel/liftover/hg18ToHg38.over.chain.gz -e /home/miguel/liftover/liftOver
+python2 "$work_dir/liftOverPlink.py" -m "$work_dir/GSE33528.map" -p "$work_dir/GSE33528.ped" -o "$work_dir/results/output_map" -c "$work_dir/hg18ToHg19.over.chain.gz" -e "$work_dir/liftOver"
 
-# y copiamos los resultados mapeados a su carpeta:
-cp /home/miguel/liftover/results/* "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/processed"
+# y copiamos los resultados mapeados a su carpeta del repositorio:
+cp "$work_dir/results"/* "$path/results/plink_data/classic/processed"
 
-
+# tras mapear deberemos convertir a plink binario (plink_binary)

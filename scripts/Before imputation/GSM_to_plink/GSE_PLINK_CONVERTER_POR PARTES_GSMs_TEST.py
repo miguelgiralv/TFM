@@ -13,7 +13,7 @@ def GSM_to_plink (gsm_inicial, gsm_final):
     dfs = []
     for i in range(gsm_inicial, gsm_final+1):
         gsm_accession="GSM" + str(i)
-        gsm_test = GEOparse.get_GEO(gsm_accession, destdir= "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/GSMs")
+        gsm_test = GEOparse.get_GEO(gsm_accession, destdir= f"{path}/data/GSMs")
         # ELIMINART ESTA PARTE, VALE CON gsm_test_id
         # Extraemos el phenotipo de los metadatos
         characteristics = gsm_test.metadata["characteristics_ch1"]
@@ -64,34 +64,35 @@ def GSM_to_plink (gsm_inicial, gsm_final):
     return(result_df)
 
 ###########################################
+# guardamos el path local al repositorio:
+path="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
 
 # Generamos el archivo map
-gpl = GEOparse.get_GEO('GPL14932',destdir="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/GEO")
+gpl = GEOparse.get_GEO('GPL14932',destdir=f"{path}/data/GEO")
 selected_columns = ["Chr","Name", "MapInfo"]
 map_table = gpl.table[selected_columns]
 map_table["position"] = 0
 order_columns= ["Chr","Name","position","MapInfo"]
-map_table.loc[:,order_columns].to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.map", sep='\t', index=False, header=False)
+map_table.loc[:,order_columns].to_csv(f"{path}/results/plink_data/classic/GSE33528.map", sep='\t', index=False, header=False)
 
 ###########################################
 
-
 # convertir los GSM en ped por partes:
 # test
-GSM_to_plink(894502, 894503).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/data/GEO/GSE33528_0.ped", index=False, header=False, sep=" ")
+GSM_to_plink(894502, 894503).to_csv(f"{path}/data/GEO/GSE33528_0.ped", index=False, header=False, sep=" ")
 # el resto:
-GSM_to_plink(894502, 894572).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_1.ped", index=False, header=False, sep="\t")
-GSM_to_plink(894589, 894719).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_2.ped", index=False, header=False, sep="\t")
-GSM_to_plink(894720, 894801).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_3.ped", index=False, header=False, sep="\t")
-GSM_to_plink(894825, 894895).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_4.ped", index=False, header=False, sep="\t")
-GSM_to_plink(894897, 894920).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_4_2.ped", index=False, header=False, sep="\t")
-GSM_to_plink(894921, 894967).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_5.ped", index=False, header=False, sep="\t")
-GSM_to_plink(894980, 895122).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_6.ped", index=False, header=False, sep="\t")
-GSM_to_plink(895123, 895273).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_7.ped", index=False, header=False, sep="\t")
-GSM_to_plink(895274, 895424).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_8.ped", index=False, header=False, sep="\t")
-GSM_to_plink(895425, 895575).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_9.ped", index=False, header=False, sep="\t")
-GSM_to_plink(895576, 895676).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_10.ped", index=False, header=False, sep="\t")
-GSM_to_plink(895677, 895768).to_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_11.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894502, 894572).to_csv(f"{path}/results/plink_data/classic/GSE33528_1.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894589, 894719).to_csv(f"{path}/results/plink_data/classic/GSE33528_2.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894720, 894801).to_csv(f"{path}/results/plink_data/classic/GSE33528_3.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894825, 894895).to_csv(f"{path}/results/plink_data/classic/GSE33528_4.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894897, 894920).to_csv(f"{path}/results/plink_data/classic/GSE33528_4_2.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894921, 894967).to_csv(f"{path}/results/plink_data/classic/GSE33528_5.ped", index=False, header=False, sep="\t")
+GSM_to_plink(894980, 895122).to_csv(f"{path}/results/plink_data/classic/GSE33528_6.ped", index=False, header=False, sep="\t")
+GSM_to_plink(895123, 895273).to_csv(f"{path}/results/plink_data/classic/GSE33528_7.ped", index=False, header=False, sep="\t")
+GSM_to_plink(895274, 895424).to_csv(f"{path}/results/plink_data/classic/GSE33528_8.ped", index=False, header=False, sep="\t")
+GSM_to_plink(895425, 895575).to_csv(f"{path}/results/plink_data/classic/GSE33528_9.ped", index=False, header=False, sep="\t")
+GSM_to_plink(895576, 895676).to_csv(f"{path}/results/plink_data/classic/GSE33528_10.ped", index=False, header=False, sep="\t")
+GSM_to_plink(895677, 895768).to_csv(f"{path}/results/plink_data/classic/GSE33528_11.ped", index=False, header=False, sep="\t")
 
 ###########################################
 # Ahora uniremos todos los ped en uno solo:
@@ -113,57 +114,60 @@ def merge_ped_files(input_files, output_file):
                     # Escribimos la linea modificada en el archivo de salida
                     outfile.write("\t".join(fields) + "\n")
 # Creamos la lista de archivos que fusionar
-input_files = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_1.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_2.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_3.ped","C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_4.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_4_2.ped", 
-               "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_5.ped","C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_6.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_7.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_8.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_9.ped", 
-               "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_10.ped", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528_11.ped"]
+input_files = [f"{path}/results/plink_data/classic/GSE33528_1.ped", f"{path}/results/plink_data/classic/GSE33528_2.ped", f"{path}/results/plink_data/classic/GSE33528_3.ped",f"{path}/results/plink_data/classic/GSE33528_4.ped", f"{path}/results/plink_data/classic/GSE33528_4_2.ped", 
+               f"{path}/results/plink_data/classic/GSE33528_5.ped",f"{path}/results/plink_data/classic/GSE33528_6.ped", f"{path}/results/plink_data/classic/GSE33528_7.ped", f"{path}/results/plink_data/classic/GSE33528_8.ped", f"{path}/results/plink_data/classic/GSE33528_9.ped", 
+               f"{path}/results/plink_data/classic/GSE33528_10.ped", f"{path}/results/plink_data/classic/GSE33528_11.ped"]
 
 # Creamos la ruta del archivo de output
-output_file = "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.ped"
+output_file = f"{path}/results/plink_data/classic/GSE33528.ped"
 
 # Ejecutamos la funcion para fusionar los ped
 merge_ped_files(input_files, output_file)
 
 # comprobamos que el numero de muestras coincide con las muestras contando las lineas:
-with open("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/GSE33528.ped", 'r') as file:
+with open(f"{path}/results/plink_data/classic/GSE33528.ped", 'r') as file:
     line_count = sum(1 for line in file)
 print(line_count)
 # coincide!
 
-# a continuación debemos realizar el mapeo de hg18 a hg38, una vez hecho, generamos el plink binario mapeado con los archivos map y ped mapeados (output_map):
-plink_command = ["C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
-"--file", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/classic/processed/output_map",
-"--allow-extra-chr", "--make-bed", "--out", "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528"]
+# a continuación debemos realizar el mapeo de hg18 a hg19 (map_genome)_liftoverplink:
+# una vez hecho el liftover, generamos el plink binario mapeado con los archivos map y ped mapeados (output_map):
+plink_command = [f"{path}/software/plink.exe",
+"--file", f"{path}/results/plink_data/classic/processed/output_map",
+"--allow-extra-chr", "--make-bed", "--out", f"{path}/results/plink_data/binary/raw/GSE33528"]
 
 subprocess.run(plink_command)
 
 # Finalmente corregiremos el sexo de nuestro plink binario con la funcion check-sex:
 plink_command = [
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
+    f"{path}/software/plink.exe",
     "--bfile",
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
+    f"{path}/results/plink_data/binary/raw/GSE33528",
     "--check-sex", 
     "--allow-extra-chr",
     "--out",
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results"
+    f"{path}/results/metadata_gsm/GSE33528_sex_check_results"
 ]
 subprocess.run(plink_command)
 # Vemos como es la tabla sexcheck:
-check_sex=pd.read_csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/GSE33528_sex_check_results.sexcheck", sep="\s+")
+check_sex=pd.read_csv(f"{path}/results/metadata_gsm/GSE33528_sex_check_results.sexcheck", sep="\s+")
 check_sex.head()
 sex_ok = check_sex[check_sex['STATUS'] == 'OK'].shape[0]
 sex_problem = check_sex[check_sex['STATUS'] == 'PROBLEM'].shape[0]
 print(sex_ok,"individuos concuerdan con nuestro método,", sex_problem,"individuos no concuerdan con la predicción de plink")
+
 # Vemos que 43 individuos no concuerdan con nuestra prediccion de plink así que nos quedamos con la estimación de plink basada en la heterocigosidad
 # ya que es mas exacto que nuestro método. Aplicamos la predicción de plink a nuestro archivo plink binario con la funcion impute-sex para tener el sexo corregido:
 plink_command = [
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/software/plink",
+    f"{path}/software/plink.exe",
     "--bfile",
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/raw/GSE33528",
+    f"{path}/results/plink_data/binary/raw/GSE33528",
     "--impute-sex",
     "--allow-extra-chr",
     "--make-bed",
     "--out",
-    "C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM/results/plink_data/binary/processed/GSE33528_sex"
+    f"{path}/results/plink_data/binary/processed/GSE33528_sex"
 ]
 subprocess.run(plink_command)
 
+#ahora pasamos al control de calidad (quality_control.py)
