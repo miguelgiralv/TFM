@@ -2,7 +2,7 @@ import pandas as pd
 
 ######################################################################
 
-path="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 # Selección de individuos con buena calidad con los metadatos 
 merged_metadata=pd.read_csv(f"{path}/results/metadata_gsm/merged_metadata.txt", sep="\t" )
 

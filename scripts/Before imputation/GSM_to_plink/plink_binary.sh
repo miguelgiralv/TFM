@@ -1,6 +1,6 @@
 
 # Una vez hecho el liftover a hg19, generamos el plink binario mapeado con los archivos map y ped mapeados (output_map):
-path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 
 "$path/software/plink" --file "$path/results/plink_data/classic/processed/output_map" \
 --allow-extra-chr --make-bed --out "$path/results/plink_data/binary/raw/GSE33528"

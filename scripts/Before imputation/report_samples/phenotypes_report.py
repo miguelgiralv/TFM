@@ -1,7 +1,7 @@
 
 import pandas as pd
 # Cargamos la tabla de fenotipos que hemos creado (en metadata_table_generate) con los metadatos 
-path="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 
 metadata = pd.read_csv(f"{path}/results/metadata_gsm/merged_metadata.txt", sep="\t")
 # La vemos

@@ -1,7 +1,7 @@
 import pandas as pd
 
 #######################################################
-path="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 
 # cargamos todos los datos (números de casos )
 # Los números de casos antes del análisis de calidad en base a metadatos
@@ -50,12 +50,18 @@ print("Antes de mapear el genoma de referencia teníamos", row_count_var_map_ant
 "Tras el análisis de calidad en base al call-rate, nos quedamos con", row_count_var_cr_despues, "variantes.","\n",
 "Hemos eliminado", row_count_var_map_despues-row_count_var_cr_despues, "variantes.","\n","\n",
 "En total se han descartado", row_count_var_map_antes-row_count_var_cr_despues,"variantes")
-# y la resumimos en una tabla que guardamos:
 
+# ahora añadimos el numero de variantes que quedan despues de imputar:
+imputado=pd.read_csv(f"{path}/results/imputado/extracted/merged.info", compression='gzip')
+
+SNPs=sum(imputado["Genotyped"]=="Genotyped")
+
+# y la resumimos en una tabla que guardamos:
 variantes_resumen=pd.DataFrame({
     "Inicial":[row_count_var_map_antes],
     "Mapeo": [row_count_var_map_despues],
-    "Call-rate": [row_count_var_cr_despues]     
+    "Call-rate": [row_count_var_cr_despues],
+    "Imputado": [SNPs]     
 })
 
 variantes_resumen.to_csv(f"{path}/results/metadata_gsm/variantes_resumen.csv", index=False)

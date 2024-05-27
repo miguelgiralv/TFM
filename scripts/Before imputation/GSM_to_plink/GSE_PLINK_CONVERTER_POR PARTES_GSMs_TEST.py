@@ -65,7 +65,7 @@ def GSM_to_plink (gsm_inicial, gsm_final):
 
 ###########################################
 # guardamos el path local al repositorio:
-path="C:/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_:MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 
 # Generamos el archivo map
 gpl = GEOparse.get_GEO('GPL14932',destdir=f"{path}/data/GEO")
@@ -130,44 +130,4 @@ with open(f"{path}/results/plink_data/classic/GSE33528.ped", 'r') as file:
 print(line_count)
 # coincide!
 
-# a continuación debemos realizar el mapeo de hg18 a hg19 (map_genome)_liftoverplink:
-# una vez hecho el liftover, generamos el plink binario mapeado con los archivos map y ped mapeados (output_map):
-plink_command = [f"{path}/software/plink.exe",
-"--file", f"{path}/results/plink_data/classic/processed/output_map",
-"--allow-extra-chr", "--make-bed", "--out", f"{path}/results/plink_data/binary/raw/GSE33528"]
-
-subprocess.run(plink_command)
-
-# Finalmente corregiremos el sexo de nuestro plink binario con la funcion check-sex:
-plink_command = [
-    f"{path}/software/plink.exe",
-    "--bfile",
-    f"{path}/results/plink_data/binary/raw/GSE33528",
-    "--check-sex", 
-    "--allow-extra-chr",
-    "--out",
-    f"{path}/results/metadata_gsm/GSE33528_sex_check_results"
-]
-subprocess.run(plink_command)
-# Vemos como es la tabla sexcheck:
-check_sex=pd.read_csv(f"{path}/results/metadata_gsm/GSE33528_sex_check_results.sexcheck", sep="\s+")
-check_sex.head()
-sex_ok = check_sex[check_sex['STATUS'] == 'OK'].shape[0]
-sex_problem = check_sex[check_sex['STATUS'] == 'PROBLEM'].shape[0]
-print(sex_ok,"individuos concuerdan con nuestro método,", sex_problem,"individuos no concuerdan con la predicción de plink")
-
-# Vemos que 43 individuos no concuerdan con nuestra prediccion de plink así que nos quedamos con la estimación de plink basada en la heterocigosidad
-# ya que es mas exacto que nuestro método. Aplicamos la predicción de plink a nuestro archivo plink binario con la funcion impute-sex para tener el sexo corregido:
-plink_command = [
-    f"{path}/software/plink.exe",
-    "--bfile",
-    f"{path}/results/plink_data/binary/raw/GSE33528",
-    "--impute-sex",
-    "--allow-extra-chr",
-    "--make-bed",
-    "--out",
-    f"{path}/results/plink_data/binary/processed/GSE33528_sex"
-]
-subprocess.run(plink_command)
-
-#ahora pasamos al control de calidad (quality_control.py)
+# a continuación debemos realizar el mapeo de hg18 a hg19 (map_genome_liftoverplink)

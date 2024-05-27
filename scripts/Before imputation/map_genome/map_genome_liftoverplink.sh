@@ -1,5 +1,5 @@
 # definimos los paths relativos:
-path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 work_dir="/home/miguel/liftover"
 
 # Copiaremos los archivos necesarios al directorio de wsl directamente ya que el codigo de liftoverPlink da problemas al tratar con paths de archivos de windows con espacios en medio 

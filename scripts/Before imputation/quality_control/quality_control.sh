@@ -1,4 +1,4 @@
-path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6 MASTER BIOINFORMATICA/TFM/Repositorio/TFM"
+path="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 
 # Ejecutaremos plink para eliminar las muestras que fallaron el test de calidad según los metadatos y que hemos almacenado en qc_failed_ids.txt (en el 
 # script de python). El comando es:
