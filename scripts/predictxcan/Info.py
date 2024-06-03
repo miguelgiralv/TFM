@@ -35,20 +35,19 @@ sum(all_info_data["Genotyped"]=="Imputed")
 
 weights=pd.read_csv(f"{path}/data/predictXcan/models/gtex_v8_en/exported_weights_db.csv")
 
-# Cogemos y procesamos la columna varID de la tabla weights, los procesamos: chr10_295356_T_C_b38  -> 10:295356:T:C 
+# Cogemos y procesamos la columna varID de la tabla weights, los procesamos: chr10_295356_T_C_b38  -> 10:295356 
 # y los guardamos en un txt de aquí los seleccionaremos en el vcf con bcftools para eliminar los que no están en 
 
 def process_snp_id(snp_id):
     parts = snp_id.split('_')  # Split the SNP ID by underscores
     chromosome = parts[0].replace('chr', '')  # Remove 'chr' prefix from chromosome
     position = parts[1]  # Position remains unchanged
-    alleles = parts[2:4]  # Extract alleles (T and C in this case)
-    return f"{chromosome}:{position}:{alleles[0]}:{alleles[1]}"  # Format the output
+    return f"{chromosome}:{position}"  # Format the output
 
 weights["varID"] = weights["varID"].apply(process_snp_id)
 len(weights)
 # tenemos 206238  snps en predictdb
-weights["varID"].to_csv(f"{path}/results/imputado/extracted/snps_predictdb.txt", index=False, header=False)
+weights["varID"].to_csv(f"{path}/results/imputado/extracted/snps_predictdb.txt", sep="\t", index=False, header=False)
 
 
 

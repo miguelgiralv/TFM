@@ -56,12 +56,15 @@ imputado=pd.read_csv(f"{path}/results/imputado/extracted/merged.info", compressi
 
 SNPs=sum(imputado["Genotyped"]=="Genotyped")
 
+SNPs_total=len(imputado)
+
 # y la resumimos en una tabla que guardamos:
 variantes_resumen=pd.DataFrame({
     "Inicial":[row_count_var_map_antes],
     "Mapeo": [row_count_var_map_despues],
     "Call-rate": [row_count_var_cr_despues],
-    "Imputado": [SNPs]     
+    "Imputado_originales": [SNPs],
+    "Imputado":SNPs_total         
 })
 
 variantes_resumen.to_csv(f"{path}/results/metadata_gsm/variantes_resumen.csv", index=False)
