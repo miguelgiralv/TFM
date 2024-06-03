@@ -44,8 +44,8 @@ for db_file in db_files:
     
 SNPS_tejidos["Tissue"]=tissues
 SNPS_tejidos["SNPs"]=n_snps
-# lo guardamos
-SNPS_tejidos.to_csv(f"{path}/data/predictXcan/elastic_net_models/SNPs_tejidos.csv", index=False)
+
+
 #ahora crearemos una tabla que contenga solo los rsids de cada una de las tablas df
 counter = 0
 db_dataframes = {}
@@ -63,8 +63,16 @@ for i in range(1, counter + 1):
     total_df = pd.concat([total_df, rsid_column]).drop_duplicates()
 total_df
 
-total_df.to_csv(f"{path}/data/predictXcan/elastic_net_models/all_rsids.txt", sep="\t", header=False, index=False)
+total_df.to_csv(f"{path}/results/predictxcan/all_rsids.txt", sep="\t", header=False, index=False)
 
+# Añadimos ahora esta información a nuestro anterior df  y luego lo guardamos todo
+SNPs_total=len(total_df)
+total_observado = {'Tissue': "Total", 'SNPs': SNPs_total}
+total_observado_df = pd.DataFrame([total_observado])
+SNPS_tejidos=pd.concat([SNPS_tejidos,total_observado_df])
+SNPS_tejidos.to_csv(f"{path}/data/predictXcan/elastic_net_models/SNPs_tejidos.csv", index=False)
+
+ 
 # con esta lista filtraremos luego los vcf de los cromosomas
 
 
