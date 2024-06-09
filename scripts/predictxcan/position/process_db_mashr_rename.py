@@ -56,14 +56,24 @@ for db_file in db_files:
     db_dataframes[counter] = fetch_data_as_df(db_file_path_full, "weights")
 print(counter)
 
-total_df = pd.DataFrame({"rsid": []})
+total_df = pd.DataFrame({"varID": []})
 for i in range(1, counter + 1):
     df_db = db_dataframes[i]
-    rsid_column = df_db[['rsid']]
+    rsid_column = df_db[['varID']]
     total_df = pd.concat([total_df, rsid_column]).drop_duplicates()
 total_df
 
-total_df.to_csv(f"{path}/results/predictxcan/all_rsids.txt", sep="\t", header=False, index=False)
+# Extracting CHROM, BEG, and END values from the varID column
+total_df['CHROM'] = total_df['varID'].apply(lambda x: x.split('_')[0].replace('chr', ''))
+total_df['BEG'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))
+total_df['END'] = total_df['BEG']
+
+# Creating a new DataFrame with the extracted values
+final_df = total_df[['CHROM', 'BEG', 'END']]
+
+final_df.to_csv(f"{path}/results/imputado/extracted/all_positions.txt", sep="\t", header=False, index=False)
+
+#con este archivo haremos un liftover a hg19 y luego filtraremos los vcf con el  (filtrarvcf_position)
 
 # Añadimos ahora esta información a nuestro anterior df  y luego lo guardamos todo
 SNPs_total=len(total_df)
@@ -73,9 +83,3 @@ SNPS_tejidos=pd.concat([SNPS_tejidos,total_observado_df])
 SNPS_tejidos.to_csv(f"{path}/data/predictXcan/elastic_net_models/SNPs_tejidos.csv", index=False)
 
  
-# con esta lista filtraremos luego los vcf de los cromosomas
-
-
-
-   
-
