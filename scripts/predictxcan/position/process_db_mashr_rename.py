@@ -12,7 +12,7 @@ def list_tables(db_path):
     tables = cursor.fetchall()
     conn.close()
     return tables
-list_tables(f"{path}/data/predictXcan/elastic_net_models/en_Adipose_Subcutaneous.db")
+list_tables(f"{path}/data/predictXcan/mashr/mashr_Whole_Blood.db")
 # vemos que hay dos tablas, weights and extra
 # hacemos una funcion para cargar las tablas como df de pandas
 def fetch_data_as_df(db_path, table_name):
@@ -64,22 +64,34 @@ for i in range(1, counter + 1):
 total_df
 
 # Extracting CHROM, BEG, and END values from the varID column
-total_df['CHROM'] = total_df['varID'].apply(lambda x: x.split('_')[0].replace('chr', ''))
+total_df['CHROM'] = total_df['varID'].apply(lambda x: x.split('_')[0])
 total_df['BEG'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))
 total_df['END'] = total_df['BEG']
 
 # Creating a new DataFrame with the extracted values
 final_df = total_df[['CHROM', 'BEG', 'END']]
 
-final_df.to_csv(f"{path}/results/imputado/extracted/all_positions.txt", sep="\t", header=False, index=False)
+final_df.to_csv(f"{path}/results/imputado/extracted/all_positions_mashr.txt", sep="\t", header=False, index=False)
 
-#con este archivo haremos un liftover a hg19 y luego filtraremos los vcf con el  (filtrarvcf_position)
+#con este archivo haremos un liftover a hg19 (filtrarvcf_position) y ahora le quitamos el chr para poder filtrar con bcftools:
+input_file = f"{path}/results/imputado/extracted/all_positions_mashr_hg19.txt" 
+output_file = f"{path}/results/imputado/extracted/all_positions_mashr_hg19_nochr.txt" 
+
+with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+    for line in infile:
+        parts = line.strip().split('\t')  
+        chromosome = parts[0].replace('chr', '') 
+        start = parts[1]
+        end = parts[2]
+        outfile.write(f"{chromosome}\t{start}\t{end}\n") 
+
+# y luego filtraremos los vcf con el  (filtrarvcf_position)
 
 # Añadimos ahora esta información a nuestro anterior df  y luego lo guardamos todo
 SNPs_total=len(total_df)
 total_observado = {'Tissue': "Total", 'SNPs': SNPs_total}
 total_observado_df = pd.DataFrame([total_observado])
 SNPS_tejidos=pd.concat([SNPS_tejidos,total_observado_df])
-SNPS_tejidos.to_csv(f"{path}/data/predictXcan/elastic_net_models/SNPs_tejidos.csv", index=False)
+SNPS_tejidos.to_csv(f"{path}/data/predictXcan/mashr_models/SNPs_tejidos_mashr.csv", index=False)
 
  

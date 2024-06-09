@@ -64,7 +64,7 @@ for i in range(1, counter + 1):
 total_df
 
 # Extracting CHROM, BEG, and END values from the varID column
-total_df['CHROM'] = total_df['varID'].apply(lambda x: x.split('_')[0].replace('chr', ''))
+total_df['CHROM'] = total_df['varID'].apply(lambda x: x.split('_')[0])
 total_df['BEG'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))
 total_df['END'] = total_df['BEG']
 
@@ -73,7 +73,19 @@ final_df = total_df[['CHROM', 'BEG', 'END']]
 
 final_df.to_csv(f"{path}/results/imputado/extracted/all_positions.txt", sep="\t", header=False, index=False)
 
-#con este archivo haremos un liftover a hg19 y luego filtraremos los vcf con el  (filtrarvcf_position)
+#con este archivo haremos un liftover a hg19 (filtrarvcf_position) y ahora le quitamos el chr para poder filtrar con bcftools:
+input_file = f"{path}/results/imputado/extracted/positions_hg19.txt" 
+output_file = f"{path}/results/imputado/extracted/positions_hg19_nochr.txt" 
+
+with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+    for line in infile:
+        parts = line.strip().split('\t')  
+        chromosome = parts[0].replace('chr', '') 
+        start = parts[1]
+        end = parts[2]
+        outfile.write(f"{chromosome}\t{start}\t{end}\n") 
+
+# y luego filtraremos los vcf con el  (filtrarvcf_position)
 
 # Añadimos ahora esta información a nuestro anterior df  y luego lo guardamos todo
 SNPs_total=len(total_df)
