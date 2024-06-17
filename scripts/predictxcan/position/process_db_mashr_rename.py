@@ -23,14 +23,14 @@ def fetch_data_as_df(db_path, table_name):
     return df
 
 # cargamos la tabla de adipose subcutaneous 
-weight_adipose_sub = fetch_data_as_df(f"{path}/data/predictXcan/elastic_net_models/en_Adipose_Subcutaneous.db", "weights")
+weight_adipose_sub = fetch_data_as_df(f"{path}/data/predictXcan/mashr_models/mashr_Adipose_Subcutaneous.db", "weights")
 weight_adipose_sub.head()
 # vemos que hay un snp por fila, por lo que el modelo predictivo para este tejido será:
 len(weight_adipose_sub)
 #ahora hacemos esto para todas los tejidos del directorio y crearemos una tabla que resuma el numero de snps:
-fetch_data_as_df(f"{path}/data/predictXcan/elastic_net_models/en_Adipose_Subcutaneous.db", "weights")
-db_files = [f for f in os.listdir(f"{path}/data/predictXcan/elastic_net_models") if f.endswith('.db')]
-db_path=f"{path}/data/predictXcan/elastic_net_models"
+fetch_data_as_df(f"{path}/data/predictXcan/mashr_models/mashr_Adipose_Subcutaneous.db", "weights")
+db_files = [f for f in os.listdir(f"{path}/data/predictXcan/mashr_models/") if f.endswith('.db')]
+db_path=f"{path}/data/predictXcan/mashr_models"
 tissues = []
 n_snps = []
 SNPS_tejidos=pd.DataFrame({"Tissue":[], "SNPs":[]})
@@ -46,7 +46,7 @@ SNPS_tejidos["Tissue"]=tissues
 SNPS_tejidos["SNPs"]=n_snps
 
 
-#ahora crearemos una tabla que contenga solo los rsids de cada una de las tablas df
+#ahora crearemos una tabla que contenga solo las posiciones de los snps de cada una de las tablas df
 counter = 0
 db_dataframes = {}
 
@@ -63,10 +63,10 @@ for i in range(1, counter + 1):
     total_df = pd.concat([total_df, rsid_column]).drop_duplicates()
 total_df
 
-# Extracting CHROM, BEG, and END values from the varID column
+# Extraemos el cromosoma, la posicion y los valores de nucleotidosde la columna varID
 total_df['CHROM'] = total_df['varID'].apply(lambda x: x.split('_')[0])
-total_df['BEG'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))
-total_df['END'] = total_df['BEG']
+total_df['BEG'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))-1
+total_df['END'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))
 
 # Creating a new DataFrame with the extracted values
 final_df = total_df[['CHROM', 'BEG', 'END']]

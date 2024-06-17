@@ -53,18 +53,24 @@ print("Antes de mapear el genoma de referencia teníamos", row_count_var_map_ant
 
 # ahora añadimos el numero de variantes que quedan despues de imputar:
 imputado=pd.read_csv(f"{path}/results/imputado/extracted/merged.info", compression='gzip')
+# leemos tambien el numero de variantes imputadas con el valor 0.1:
+imputado_2=pd.read_csv(f"{path}/results/imputado/extracted/merged_2.info", compression='gzip')
 
 SNPs=sum(imputado["Genotyped"]=="Genotyped")
+SNPs_2=sum(imputado_2["Genotyped"]=="Genotyped")
 
 SNPs_total=len(imputado)
+SNPs_total_2=len(imputado_2)
 
 # y la resumimos en una tabla que guardamos:
 variantes_resumen=pd.DataFrame({
     "Inicial":[row_count_var_map_antes],
     "Mapeo": [row_count_var_map_despues],
     "Call-rate": [row_count_var_cr_despues],
-    "Imputado_originales": [SNPs],
-    "Imputado":SNPs_total         
+    "Imputado_0,3_GT": [SNPs],
+    "Imputado_0,3":SNPs_total,
+    "Imputado_0,1_GT": [SNPs_2],
+    "Imputado_0,1":SNPs_total_2,           
 })
 
 variantes_resumen.to_csv(f"{path}/results/metadata_gsm/variantes_resumen.csv", index=False)
