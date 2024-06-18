@@ -12,7 +12,7 @@ def list_tables(db_path):
     tables = cursor.fetchall()
     conn.close()
     return tables
-list_tables(f"{path}/data/predictXcan/mashr/mashr_Whole_Blood.db")
+list_tables(f"{path}/data/predictXcan/elastic_net_models/en_Whole_Blood.db")
 # vemos que hay dos tablas, weights and extra
 # hacemos una funcion para cargar las tablas como df de pandas
 def fetch_data_as_df(db_path, table_name):
@@ -23,14 +23,14 @@ def fetch_data_as_df(db_path, table_name):
     return df
 
 # cargamos la tabla de adipose subcutaneous 
-weight_adipose_sub = fetch_data_as_df(f"{path}/data/predictXcan/mashr_models/mashr_Adipose_Subcutaneous.db", "weights")
+weight_adipose_sub = fetch_data_as_df(f"{path}/data/predictXcan/elastic_net_models/en_Whole_Blood.db", "weights")
 weight_adipose_sub.head()
 # vemos que hay un snp por fila, por lo que el modelo predictivo para este tejido será:
 len(weight_adipose_sub)
 #ahora hacemos esto para todas los tejidos del directorio y crearemos una tabla que resuma el numero de snps:
-fetch_data_as_df(f"{path}/data/predictXcan/mashr_models/mashr_Adipose_Subcutaneous.db", "weights")
-db_files = [f for f in os.listdir(f"{path}/data/predictXcan/mashr_models/") if f.endswith('.db')]
-db_path=f"{path}/data/predictXcan/mashr_models"
+fetch_data_as_df(f"{path}/data/predictXcan/elastic_net_models/en_Adipose_Subcutaneous.db", "weights")
+db_files = [f for f in os.listdir(f"{path}/data/predictXcan/elastic_net_models/") if f.endswith('.db')]
+db_path=f"{path}/data/predictXcan/elastic_net_models/"
 tissues = []
 n_snps = []
 SNPS_tejidos=pd.DataFrame({"Tissue":[], "SNPs":[]})
@@ -71,11 +71,11 @@ total_df['END'] = total_df['varID'].apply(lambda x: int(x.split('_')[1]))
 # Creating a new DataFrame with the extracted values
 final_df = total_df[['CHROM', 'BEG', 'END']]
 
-final_df.to_csv(f"{path}/results/imputado/extracted/all_positions_mashr.txt", sep="\t", header=False, index=False)
+final_df.to_csv(f"{path}/results/imputado/extracted/all_positions_en.txt", sep="\t", header=False, index=False)
 
 #con este archivo haremos un liftover a hg19 (filtrarvcf_position) y ahora le quitamos el chr para poder filtrar con bcftools:
-input_file = f"{path}/results/imputado/extracted/all_positions_mashr_hg19.txt" 
-output_file = f"{path}/results/imputado/extracted/all_positions_mashr_hg19_nochr.txt" 
+input_file = f"{path}/results/imputado/extracted/all_positions_en_hg19.txt" 
+output_file = f"{path}/results/imputado/extracted/all_positions_en_hg19_nochr.txt" 
 
 with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
     for line in infile:
@@ -92,6 +92,6 @@ SNPs_total=len(total_df)
 total_observado = {'Tissue': "Total", 'SNPs': SNPs_total}
 total_observado_df = pd.DataFrame([total_observado])
 SNPS_tejidos=pd.concat([SNPS_tejidos,total_observado_df])
-SNPS_tejidos.to_csv(f"{path}/data/predictXcan/mashr_models/SNPs_tejidos_mashr.csv", index=False)
+SNPS_tejidos.to_csv(f"{path}/data/predictXcan/elastic_net_models/SNPs_tejidos_en.csv", index=False)
 
  

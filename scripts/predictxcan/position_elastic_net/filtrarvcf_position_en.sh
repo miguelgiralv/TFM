@@ -16,7 +16,43 @@ $path/results/imputado/extracted/chr1.dose.vcf.gz \
 -o $path/results/imputado/extracted/filtered/elastic_net/chr1.dose_filter_en.vcf.gz
 
 # ahora filtramos todos los cromosomas: 
-for chr in {2..5} ; do
+for chr in {2..4} ; do
+bcftools view \
+-R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
+$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
+-o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
+echo "${chr} filtrado!"
+done
+#2 filtrado
+
+for chr in {5..7} ; do
+bcftools view \
+-R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
+$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
+-o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
+echo "${chr} filtrado!"
+done
+#5 filtrado
+
+for chr in {8..10} ; do
+bcftools view \
+-R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
+$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
+-o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
+echo "${chr} filtrado!"
+done
+#8 filtrado
+
+for chr in {11..13} ; do
+bcftools view \
+-R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
+$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
+-o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
+echo "${chr} filtrado!"
+done
+#11 filtrado
+
+for chr in {14..16} ; do
 bcftools view \
 -R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
 $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
@@ -24,23 +60,7 @@ $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
 echo "${chr} filtrado!"
 done
 
-for chr in {6..10} ; do
-bcftools view \
--R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
-$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
--o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
-echo "${chr} filtrado!"
-done
-
-for chr in {11..15} ; do
-bcftools view \
--R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
-$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
--o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
-echo "${chr} filtrado!"
-done
-
-for chr in {16..20} ; do
+for chr in {17..20} ; do
 bcftools view \
 -R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
 $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
