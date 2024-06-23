@@ -16,7 +16,7 @@ $path/results/imputado/extracted/chr1.dose.vcf.gz \
 -o $path/results/imputado/extracted/filtered/elastic_net/chr1.dose_filter_en.vcf.gz
 
 # ahora filtramos todos los cromosomas: 
-for chr in {2..4} ; do
+for chr in {3..4} ; do
 bcftools view \
 -R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
 $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
@@ -25,7 +25,7 @@ echo "${chr} filtrado!"
 done
 #2 filtrado
 
-for chr in {5..7} ; do
+for chr in {6..10} ; do
 bcftools view \
 -R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
 $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
@@ -34,7 +34,7 @@ echo "${chr} filtrado!"
 done
 #5 filtrado
 
-for chr in {8..10} ; do
+for chr in {11..15} ; do
 bcftools view \
 -R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
 $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
@@ -43,7 +43,7 @@ echo "${chr} filtrado!"
 done
 #8 filtrado
 
-for chr in {11..13} ; do
+for chr in {16..20} ; do
 bcftools view \
 -R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
 $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
@@ -51,6 +51,14 @@ $path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
 echo "${chr} filtrado!"
 done
 #11 filtrado
+
+for chr in {21..22} X; do
+bcftools view \
+-R $path/results/imputado/extracted/all_positions_en_hg19_nochr.txt \
+$path/results/imputado/extracted/chr${chr}.dose.vcf.gz \
+-o $path/results/imputado/extracted/filtered/elastic_net/chr${chr}.dose_filter_en.vcf.gz
+echo "${chr} filtrado!"
+done
 
 for chr in {14..16} ; do
 bcftools view \
@@ -88,8 +96,8 @@ done
 ############# Concatenamos todos los cromosomas:
 
 bcftools concat -Oz -o $path/results/imputado/extracted/filtered/elastic_net/fullgenome_en.vcf.gz \
-    $path/results/imputado/extracted/filtered/mashr/chr{1..22}.dose_filter_en.vcf.gz \
-    $path/results/imputado/extracted/filtered/mashr/chrX.dose_filter_en.vcf.gz \
+    $path/results/imputado/extracted/filtered/elastic_net/chr{1..22}.dose_filter_en.vcf.gz \
+    $path/results/imputado/extracted/filtered/elastic_net/chrX.dose_filter_en.vcf.gz \
 
 
 
@@ -101,8 +109,8 @@ python3 $METAXCAN/Predict.py \
 --vcf_mode imputed \
 --liftover $DATA/hg19ToHg38.over.chain.gz \
 --on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
---prediction_output $RESULTS/vcf_1000G_hg37_en/Adipose_Subcutaneous.txt \
---prediction_summary_output $RESULTS/vcf_1000G_hg37_en/Adipose_Subcutaneous_summary.txt \
+--prediction_output $RESULTS/vcf_1000G_hg37_en/Adipose_Subcutaneous_test.txt \
+--prediction_summary_output $RESULTS/vcf_1000G_hg37_en/Adipose_Subcutaneous_summary_test.txt \
 --verbosity 9 \
 --throw
 
@@ -114,21 +122,36 @@ DATA="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repo
 RESULTS="/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/predictXcan/test"
 
 {
-for tissue_file in $DATA/predictXcan/mashr_models/*.db; do
-    tissue=$(basename "$tissue_file" .db)
-    python3 $METAXCAN/Predict.py \
-    --model_db_path "$tissue_file" \
-    --model_db_snp_key varID \
-    --vcf_genotypes $path/results/imputado/extracted/filtered/mashr/fullgenome_mashr.vcf.gz \
-    --vcf_mode imputed \
-    --liftover $DATA/hg19ToHg38.over.chain.gz \
-    --on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
-    --prediction_output $RESULTS/vcf_1000G_hg37_mashr/${tissue}_predict.txt \
-    --prediction_summary_output $RESULTS/vcf_1000G_hg37_mashr/${tissue}_summary.txt \
-    --verbosity 9 \
-    --throw 
+for tissue_file in $DATA/elastic_net_models/*.db; do
+tissue=$(basename "$tissue_file" .db)
+python3 $METAXCAN/Predict.py \
+--model_db_path "$tissue_file" \
+--model_db_snp_key varID \
+--vcf_genotypes $path/results/imputado/extracted/filtered/elastic_net/fullgenome_en.vcf.gz \
+--vcf_mode imputed \
+--liftover $DATA/hg19ToHg38.over.chain.gz \
+--on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
+--prediction_output $RESULTS/vcf_1000G_hg37_en/${tissue}_predict.txt \
+--prediction_summary_output $RESULTS/vcf_1000G_hg37_en/${tissue}_summary_test.txt \
+--verbosity 9 \
+--throw
 done
-} 2>&1 | tee "$RESULTS/vcf_1000G_hg37_mashr/log.txt"
+} 2>&1 | tee "$RESULTS/vcf_1000G_hg37_en/log.txt"
+
+tissue="en_Whole_Blood"
+python3 $METAXCAN/Predict.py \
+  --model_db_path $DATA/elastic_net_models/${tissue}.db \
+  --model_db_snp_key varID \
+  --vcf_genotypes $path/results/imputado/extracted/filtered/elastic_net/fullgenome_en.vcf.gz \
+  --vcf_mode imputed \
+  --liftover $DATA/hg19ToHg38.over.chain.gz \
+  --on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
+  --prediction_output $RESULTS/vcf_1000G_hg37_en/${tissue}_predict.txt \
+  --prediction_summary_output $RESULTS/vcf_1000G_hg37_en/${tissue}_summary.txt \
+  --verbosity 9 \
+  --throw
+
+
 
 
 ## FUNCIONA LOOP POR TODOS LOS TEJIDOS:

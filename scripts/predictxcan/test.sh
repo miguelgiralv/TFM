@@ -47,7 +47,18 @@ python3 $METAXCAN/Predict.py \
 --verbosity 9 \
 --throw
 
-
+printf "Predict expression\n\n"
+python3 $METAXCAN/Predict.py \
+--model_db_path $DATA/models/gtex_v8_mashr/mashr_Whole_Blood.db \
+--model_db_snp_key varID \
+--vcf_genotypes $DATA/1000G_hg37/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+--vcf_mode genotyped \
+--liftover $DATA/hg19ToHg38.over.chain.gz \
+--on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
+--prediction_output $RESULTS/vcf_1000G_hg37_mashr/Whole_Blood__predict.txt \
+--prediction_summary_output $RESULTS/vcf_1000G_hg37_mashr/Whole_Blood__summary.txt \
+--verbosity 9 \
+--throw
 
 # ver la informacion de los archivos .info
 
