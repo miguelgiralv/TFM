@@ -1,0 +1,126 @@
+---
+title: "NetActivity"
+author: "Miguel G.A."
+date: "2024-06-24"
+output: html_document
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r, echo=FALSE} 
+library(NetActivity)
+library(limma)
+library(SummarizedExperiment)
+library(tidyverse)
+library(SparseArray)
+```
+
+Cargamos la expresion en el tejido adiposo subcutaneo como un df en R:
+```{r}
+
+df_adipose_en <- read.csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/predictXcan/test/vcf_1000G_hg37_en/processed/processed_en_Adipose_Subcutaneous_predict.txt", header = TRUE, sep = "\t")
+
+
+dim(df_adipose_en)
+
+```
+
+Procesamos las filas para que en los individuos no aparezca el gse y tambien cambiamos los nombres de los genes para que no aparezca la version de ensembl
+
+```{r}
+individuals <- df_adipose_en[, 1]
+individuals <- sub("^GSE33528_", "", individuals)
+
+df_adipose_en[, 1] <- individuals
+
+colnames(df_adipose_en) <- sub("\\.\\d+$", "", colnames(df_adipose_en))
+individuals_cases <- read.csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", header = TRUE, sep = "\t")
+
+
+```
+
+Fusionamos las dos matrices de individuos con metadatos y creamos una nueva que contenga solo los datos del experimento y su enfermedad
+
+```{r}
+merged_individuals <- merge(
+  x = data.frame(Individual.ID = individuals), 
+  y = individuals_cases[, c("Individual.ID", "Disease.status")],
+  by.x = "Individual.ID",
+  by.y = "Individual.ID",
+  all.x = TRUE  
+)
+
+```
+
+Ahora transponemos nuestra matriz de expresion de forma que para cada fila haya un gen y para cada individuo haya una columna
+```{r}
+gene_columns <- df_adipose_en[, !names(df_adipose_en) %in% "IID", drop = FALSE]
+
+transposed_genes <- t(as.matrix(gene_columns))
+
+df_adipose_en_trans <- as.data.frame(transposed_genes)
+
+
+colnames(df_adipose_en_trans)<-individuals
+
+
+dim(df_adipose_en_trans)
+```
+
+
+Finalmente añadimos row_data y col_data y cargamos todos los datos para cargar el objeto SummarizedExperiment
+```{r}
+genes <- df_adipose_en[, !names(df_adipose_en) %in% "IID"]
+
+
+row_data <- DataFrame(
+  Gene = rownames(df_adipose_en_trans)
+)
+
+col_data <- data.frame(
+  Sample = merged_individuals$Individual.ID,
+  DiseaseStatus = merged_individuals$Disease.status
+)
+
+
+
+se_adipose_en <- SummarizedExperiment(
+  assays = list(expression = as.matrix(df_adipose_en_trans)), # lo guardamos como una matriz y no un df
+  colData = col_data,
+  rowData = row_data
+)
+
+str(se_adipose_en)
+```
+
+Ahora podemos ya aplicar netactivity
+```{r}
+out_adipose_en <- prepareSummarizedExperiment(se_adipose_en, "gtex_gokegg")
+
+scores_adipose_en <- computeGeneSetScores(out_adipose_en, "gtex_gokegg")
+
+
+```
+
+
+```{r}
+mod_adipose_en <- model.matrix(~ DiseaseStatus , colData(scores_adipose_en))
+fit <- lmFit(assay(scores_adipose_en), mod_adipose_en) %>% eBayes()
+topTab <- topTable(fit, coef = 1:2, n = Inf)
+head(topTab)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,53 +14,13 @@ BiocManager::install("NetActivity")
 
 ## ----warning = FALSE, message = FALSE-----------------------------------------
 library(NetActivity)
-library(DESeq2)
-library(airway)
-data(airway)
-
+library(limma)
 library(SummarizedExperiment)
-
-
-## -----------------------------------------------------------------------------
-ddsSE <- DESeqDataSet(airway, design = ~ cell + dex)
-vst <- varianceStabilizingTransformation(ddsSE)
-
-## -----------------------------------------------------------------------------
-out <- prepareSummarizedExperiment(vst, "gtex_gokegg")
-out
-
-## ----warning = FALSE, message = FALSE-----------------------------------------
 library(tidyverse)
 
-## ----plot, fig.cap = "Standardization. Effect of standardization on gene expression values. Before represent the gene expression values passed to prepareSummarizedExperiment. After are the values obtained after prepareSummarizedExperiment."----
-rbind(assay(vst[1:5, ]) %>%
-        data.frame() %>%
-        mutate(Gene = rownames(.)) %>%
-        gather(Sample, Expression, 1:8) %>%
-        mutate(Step = "Before"),
-      assay(out[1:5, ]) %>%
-        data.frame() %>%
-        mutate(Gene = rownames(.)) %>%
-        gather(Sample, Expression, 1:8) %>%
-        mutate(Step = "After")) %>%
-  mutate(Step = factor(Step, levels = c("Before", "After"))) %>%
-  ggplot(aes(x = Gene, y = Expression, col = Gene)) +
-  geom_boxplot() +
-  theme_bw() +
-  facet_grid(~ Step, scales = "free") +
-  theme(axis.ticks = element_blank(), axis.text.x = element_blank())        
-
-## -----------------------------------------------------------------------------
-assay(out["ENSG00000278637", ]) 
-
-## ----message = FALSE, warning = FALSE-----------------------------------------
-library(limma)
-library(Fletcher2013a)
-data(Exp1)
-Exp1
 
 #cargamos la expresion en el tejido adiposo subcutaneo como un df en R:
-df_adipose_en <- read.csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/predictXcan/test/vcf_1000G_hg37_en/en_Adipose_Subcutaneous_predict.txt", header = TRUE, sep = "\t")
+df_adipose_en <- read.csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/predictXcan/test/vcf_1000G_hg37_en/processed/processed_en_Adipose_Subcutaneous_predict.txt", header = TRUE, sep = "\t")
 
 head(df_adipose_en)
 
@@ -68,94 +28,76 @@ dim(df_adipose_en)
 
 individuals<-df_adipose_en[,1]
 
-genes <- df_adipose_en[, -c(1, 2)]
+#procesamos las filas para que en los individuos no aparezca el gse:
 
-colnames(genes) <- sub("\\.\\d+$", "", colnames(genes))
+first_column <- df_adipose_en[, 1, drop = FALSE]
+first_column[, 1] <- sub("^GSE33528_", "", first_column[, 1])
+df_adipose_en[, 1] <- first_column[, 1]
 
+# tambien cambiamos los nombres de los genes para que no aparezca la version
+colnames(df_adipose_en) <- sub("\\.\\d+$", "", colnames(df_adipose_en))
 
-row_data <- data.frame(Gene = colnames(genes))
-col_data <- data.frame(SampleID = individuals)
+# cargamos tambien los metadatos para saber que individuo tiene alzheimer y cual no
+individuals_cases <- read.csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/metadata_gsm/merged_metadata.txt", header = TRUE, sep = "\t")
+colnames(individuals_cases)
 
-se_adipose_en <- SummarizedExperiment(
-  assays = list(expression = t(as.matrix(genes))),  
-  rowData = row_data,
-  colData = col_data
+# fusionamos las dos matrices de individuos con metadatos y creamos una nueva que contenga solo los datos del experimento y su enfermedad
+merged_individuals <- merge(
+  x = data.frame(Individual.ID = individuals),  # Ensure x is a dataframe with Individual.ID column
+  y = individuals_cases[, c("Individual.ID", "Disease.status")],
+  by.x = "Individual.ID",
+  by.y = "Individual.ID",
+  all.x = TRUE  # Keep all rows from x (individuals)
 )
+
+# ahora transponemos nuestra matriz de expresion de forma que para cada fila haya un gen y para cada individuo haya una columna
+
+gene_columns <- df_adipose_en[, !names(df_adipose_en) %in% "IID", drop = FALSE]
+
+transposed_genes <- t(as.matrix(gene_columns))
+
+df_adipose_en_trans <- as.data.frame(transposed_genes)
+
+colnames(df_adipose_en_trans)<-individuals
+
+# Print or use new_df as needed
+print(new_df)
+
+
+assays = list(expression = t(as.matrix(df_adipose_en)))
+
+expression[,1]
+
+head(assays)
+se_adipose_en <- SummarizedExperiment(
+  assays,
+  colData = col_data,
+  rowData = row_data
+)
+assays = list(expression = t(as.matrix(df_adipose_en)))
+
+vst_en <- varianceStabilizingTransformation(se_adipose_en)
+
 
 out_adipose_en <- prepareSummarizedExperiment(se_adipose_en, "gtex_gokegg")
 
+scores_adipose_en <- computeGeneSetScores(out_adipose_en, "gtex_gokegg")
+
+scores_adipose_en
+
+rowData(scores_adipose_en)
+colData(scores_adipose_en)
+
+colData(scores)
 
 
-# Warning message:
-#In prepareSummarizedExperiment(se_adipose_en, "gtex_gokegg") :
-# 5031 genes present in the model not found in input data. The expression of all samples will be set to 0.
+mod_adipose_en <- model.matrix(~ Disease.status, colData(scores_adipose_en))
+fit <- lmFit(assay(scores_adipose_en), mod_adipose_en) %>% eBayes()
+topTab <- topTable(fit, coef = 1:2, n = Inf)
+head(topTab)
 
 
-
-df_adipose_mash <- read.csv("C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/predictXcan/test/vcf_1000G_hg37_mashr/mashr_Adipose_Subcutaneous_predict.txt", header = TRUE, sep = "\t")
-
-dim(df_adipose_mash)
-
-
-
-
-se
-
-
-
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
-
-## ----eval = FALSE-------------------------------------------------------------
-if (!require("BiocManager", quietly = TRUE))
-install.packages("BiocManager")
-  
-BiocManager::install("NetActivity")
-
-## ----eval = FALSE-------------------------------------------------------------
-#  # install.packages("devtools")
-#  devtools::install_github("yocra3/NetActivity")
-#  devtools::install_github("yocra3/NetActivityData")
-
-## ----warning = FALSE, message = FALSE-----------------------------------------
-library(NetActivity)
-library(DESeq2)
-library(airway)
-data(airway)
-
-## -----------------------------------------------------------------------------
-ddsSE <- DESeqDataSet(airway, design = ~ cell + dex)
-vst <- varianceStabilizingTransformation(ddsSE)
-
-## -----------------------------------------------------------------------------
-out <- prepareSummarizedExperiment(vst, "gtex_gokegg")
-out
-
-## ----warning = FALSE, message = FALSE-----------------------------------------
-library(tidyverse)
-
-## ----plot, fig.cap = "Standardization. Effect of standardization on gene expression values. Before represent the gene expression values passed to prepareSummarizedExperiment. After are the values obtained after prepareSummarizedExperiment."----
-rbind(assay(vst[1:5, ]) %>%
-        data.frame() %>%
-        mutate(Gene = rownames(.)) %>%
-        gather(Sample, Expression, 1:8) %>%
-        mutate(Step = "Before"),
-      assay(out[1:5, ]) %>%
-        data.frame() %>%
-        mutate(Gene = rownames(.)) %>%
-        gather(Sample, Expression, 1:8) %>%
-        mutate(Step = "After")) %>%
-  mutate(Step = factor(Step, levels = c("Before", "After"))) %>%
-  ggplot(aes(x = Gene, y = Expression, col = Gene)) +
-  geom_boxplot() +
-  theme_bw() +
-  facet_grid(~ Step, scales = "free") +
-  theme(axis.ticks = element_blank(), axis.text.x = element_blank())        
-
-## -----------------------------------------------------------------------------
-assay(out["ENSG00000278637", ]) 
-
-## ----message = FALSE, warning = FALSE-----------------------------------------
+----------------------------
 library(limma)
 library(Fletcher2013a)
 data(Exp1)
@@ -191,6 +133,7 @@ scores
 
 ## -----------------------------------------------------------------------------
 rowData(scores)
+colData(scores)
 
 ## -----------------------------------------------------------------------------
 mod <- model.matrix(~ Treatment + Time, colData(scores))
