@@ -1,8 +1,11 @@
 ---
-title: "NetActivity"
+html_preview: false
 author: "Miguel G.A."
 date: "2024-06-24"
-output: html_document
+output:
+  github_document: default
+  html_preview: default
+title: "NetActivity"
 ---
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
@@ -93,6 +96,7 @@ se_adipose_en <- SummarizedExperiment(
 )
 
 str(se_adipose_en)
+
 ```
 
 Ahora podemos ya aplicar netactivity
