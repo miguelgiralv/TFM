@@ -21,7 +21,7 @@ python3 $METAXCAN/Predict.py \
 # todos los tejidos:
 {
 for tissue_file in "$DATA/mashr_models"/*.db; do
-    echo "Processing file: $tissue_file"  # Debugging output
+    echo "Processing file: $tissue_file" 
     tissue=$(basename "$tissue_file" .db)
     python3 "$METAXCAN/Predict.py" \
     --model_db_path "$tissue_file" \

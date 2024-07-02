@@ -19,6 +19,7 @@ perl "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repo
 -f "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/freq-file" \
 -r "/mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/data/imputar/1000GP_Phase3_combined.legend" -g
 
+
 # guardamos los vcf en results\imputation\chr, los copiamos a vcf_impute:
 cp /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/chr/*.vcf /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/vcf_impute
 
@@ -29,6 +30,23 @@ for file in /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TF
         bgzip "$file"
     fi
 done
+
+# Finalmente comprobamos ahora el número de SNPs total resultante tras la preparación de datos:
+bcftools view -H /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/vcf_impute/old/*.gz | wc -l
+bcftools index /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/vcf_impute/old/*.gz
+
+for vcf in /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/vcf_impute/old/*.vcf.gz; do
+    bcftools index "$vcf"
+done
+
+total_snps=0
+for vcf in /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/imputation/vcf_impute/old/*.vcf.gz; do
+    snp_count=$(bcftools view -H "$vcf" | wc -l)
+    total_snps=$((total_snps + snp_count))
+done     
+# guardamos el número de SNPs resultante para 
+echo "$total_snps" > "$path/results/metadata_gsm/SNPs_before_imputation.txt"
+
 
 ################
 #DUDAS?

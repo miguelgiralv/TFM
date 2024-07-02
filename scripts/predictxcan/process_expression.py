@@ -114,13 +114,11 @@ mashr_n_genes_processed=count_genes_in_files_processed("results/predictXcan/test
 en_n_genes=count_genes_in_files("results/predictXcan/test/vcf_1000G_hg37_en", "en_", "en")
 en_n_genes_processed=count_genes_in_files_processed("results/predictXcan/test/vcf_1000G_hg37_en/processed", "processed_en_", "proc_en")
 
-n_genes_tissues = pd.merge(mashr_n_genes, mashr_n_genes_processed,en_n_genes, en_n_genes_processed, on='Tejido', how='outer')
 
 n_genes_tissues = pd.merge(mashr_n_genes, mashr_n_genes_processed, on='Tejido', how='outer')
 n_genes_tissues = pd.merge(n_genes_tissues, en_n_genes, on='Tejido', how='outer')
 n_genes_tissues = pd.merge(n_genes_tissues, en_n_genes_processed, on='Tejido', how='outer')
 
-n_genes_tissues["mashr_diff"]=n_genes_tissues["mashr"]-n_genes_tissues["proc_mashr"]
-n_genes_tissues["en_diff"]=n_genes_tissues["en"]-n_genes_tissues["proc_en"]
+
 
 n_genes_tissues.to_csv(f"{path}/results/predictXcan/test/n_genes_tissues.csv", index=False)

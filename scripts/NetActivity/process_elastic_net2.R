@@ -101,15 +101,22 @@ se_adipose_en <- SummarizedExperiment(
   colData = col_data,
   rowData = row_data
 )
-
+str(se_adipose_en)
 
 # preparamos el experimento
 out_adipose_en <- prepareSummarizedExperiment(se_adipose_en, "gtex_gokegg")
 
 # 5031 genes del modelo de netactivity no estan en nuestros datos, es decir que solo coge unos 3000 genes
 scores_adipose_en <- computeGeneSetScores(out_adipose_en, "gtex_gokegg")
+rownames(assay(scores_adipose_en))="adipose"
+
+class(assay((scores_adipose_en)))
 
 scores_adipose_en
+
+
+
+assay(scores_adipose_en)
 # le añade a rowData los pesos de los g
 rowData(scores_adipose_en)
 colData(scores_adipose_en)
@@ -120,6 +127,7 @@ fit <- lmFit(assay(scores_adipose_en), mod_adipose_en) %>% eBayes()
 #  Zero sample variances detected, have been offset away from zero
 topTab <- topTable(fit, coef = 1:2, n = Inf)
 head(topTab)
+
 
 
 

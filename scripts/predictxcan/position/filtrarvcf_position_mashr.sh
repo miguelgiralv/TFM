@@ -78,14 +78,14 @@ bcftools concat -Oz -o $path/results/imputado/extracted/filtered/mashr/fullgenom
 
 ####### Finalmente aplicamos predictXcan con sangre
 python3 $METAXCAN/Predict.py \
---model_db_path $DATA/models/gtex_v8_mashr/mashr_Whole_Blood.db \
+--model_db_path $DATA/mashr_models/mashr_Adipose_Subcutaneous.db \
 --model_db_snp_key varID \
 --vcf_genotypes $path/results/imputado/extracted/filtered/mashr/fullgenome_mashr.vcf.gz \
 --vcf_mode imputed \
 --liftover $DATA/hg19ToHg38.over.chain.gz \
 --on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
---prediction_output $RESULTS/vcf_1000G_hg37_mashr/test_whole_Whole_Blood_7_predict.txt \
---prediction_summary_output $RESULTS/vcf_1000G_hg37_mashr/test_whole_Whole_Blood_7_summary.txt \
+--prediction_output $RESULTS/vcf_1000G_hg37_mashr/mashr_Adipose_Subcutaneous_predict.txt \
+--prediction_summary_output $RESULTS/vcf_1000G_hg37_mashr/mashr_Adipose_Subcutaneous_summary.txt \
 --verbosity 9 \
 --throw
 
