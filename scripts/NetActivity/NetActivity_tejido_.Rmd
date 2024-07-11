@@ -149,7 +149,6 @@ all_info <- data.frame()
 for (i in 1:length(score_tissue_list)) {
   score_tissue <- score_tissue_list[[tissue_names[[i]]]]
   
-  # Set "control" as the reference level
   colData(score_tissue)$DiseaseStatus <- as.factor(colData(score_tissue)$DiseaseStatus)
   
   colData(score_tissue)$DiseaseStatus <- relevel(colData(score_tissue)$DiseaseStatus, ref = "control")
