@@ -12,7 +12,7 @@ done
 $path/software/plink --bfile $path/results/plink_data/binary/processed/GSE33528_qc_cr_in \
 --score $path/data/PRS/PGS000054_hmPOS_GRCh37.txt 1 4 5 header --out $path/results/PRS/PGS000054_PRS_results.txt
 
-# para PGS004146
+# para PGS004146 (hay que eliminar los metadatos al inicio del archivo)
 $path/software/plink --bfile $path/results/plink_data/binary/processed/GSE33528_qc_cr_in \
 --score $path/data/PRS/PGS004146_hmPOS_GRCh37_2.txt 1 4 6 header --out $path/results/PRS/PGS004146_hmPOS_GRCh37
 
@@ -20,7 +20,7 @@ $path/software/plink --bfile $path/results/plink_data/binary/processed/GSE33528_
 
 # ejecutar la regresion logistica
 $path/software/plink --bfile $path/results/plink_data/binary/processed/GSE33528_qc_cr_in \
---covar $path/results/PRS/PGS004146_PRS_results.profile \
+--covar $path/results/PRS/PGS004146_hmPOS_GRCh37_clean.profile \
 --covar-name SCORE \
 --logistic \
 --out $path/results/PRS/logistic_regression_with_PRS
