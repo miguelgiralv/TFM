@@ -1,11 +1,9 @@
 import pandas as pd
 import os
 import numpy as np
+import scipy.stats as stats
 
 
-###### buenoo
-tissue=predict_files[1]
-tissue_pd=pd.DataFrame
 path = "C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
 
 tissue_paths=f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr"
@@ -19,327 +17,169 @@ merged_data=pd.DataFrame
 
 for tissue in predict_files:
     tissue_pd=pd.read_csv(os.path.join(tissue_paths, tissue), sep="\t",  on_bad_lines='skip')
-    tissue_pd=tissue_pd.drop(["FID", "IID"], axis=1)
+    tissue_pd=tissue_pd.drop(["FID"], axis=1)
     tissue_name = tissue.replace("mashr_", "").replace("_predict.txt", "")
-    tissue_pd["tissue"]=tissue_name
     data_frames.append(tissue_pd)
     tissue_names.append(tissue_name)
     print(tissue_name,"cargado")
+
+data_frames[1]
+###bien
+
+genes=[]
+for tissue in len(data_frames):
+    tissue_df=data_frames[tissue]
+    for col in tissue_df.columns:
+        if col != 'IID':
+            col=[]
+            for tissue in len(data_frames):
+                col={}
+                
+                
+###BIEN! COMPROBAR CON CARLOS Y HACER EL LOOP POR TODOS LOS TEJIDOS PARA NO DEJARME NINGUN GEN, LUEGO HACER MERGE EN UNA                
+number=1                
+all_correlations = []
+# Iterate through columns of the first DataFrame (excluding 'IID')
+for col_name in data_frames[1].columns:
+    if col_name != 'IID' and col_name != 'tissue':
+        # Create a DataFrame to hold data for the current gene across all tissues
+        gene_df = pd.DataFrame()
+        for i, df in enumerate(data_frames):
+            tissue_name = tissue_names[i]
+            if col_name in df.columns:
+                gene_tissue = f"{col_name}_{tissue_name}"
+                gene_df[gene_tissue] = df[col_name]       
+        # Calculate the correlation matrix for the current gene
+        if not gene_df.empty:
+            correlation_matrix = gene_df.corr()
+            new_index = [name.split('_', 1)[-1] for name in correlation_matrix.index]
+            correlation_matrix.index = new_index
+        all_correlations.append(correlation_matrix)
+        number=number+1
+        print(number)
+
+df = df.loc[:, ~df.columns.duplicated()]
+
+# COMPROBAR QUE ES LO QUE QUERIA CARLOS Y LUEGO HACER LOOP POR TODOS LOS TEJIDOS PARA NO DEJARME NINGUN GEN, LUEGO HACER MERGE QUITANDO LOS GENES REDUNDANTES
+merged_df = pd.concat(all_correlations, axis=1)
+transposed_df = merged_df.T
+transposed_df.to_csv(f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr/correlation.txt", sep="\t", header= True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+### non valid
+
     
+for tissue in predict_files:
+    tissue_pd=pd.read_csv(os.path.join(tissue_paths, tissue), sep="\t",  on_bad_lines='skip')
+    tissue_pd=tissue_pd.drop(["FID"], axis=1)
+    tissue_name = tissue.replace("mashr_", "").replace("_predict.txt", "")
+    new_columns = {}
+    for col in tissue_pd.columns:
+        if col != 'IID':  
+            new_columns[col] = f"{col}_{tissue_name}"
+        else:
+            new_columns[col] = col  
+    tissue_pd.rename(columns=new_columns, inplace=True)  
+    data_frames.append(tissue_pd)
+    tissue_names.append(tissue_name)
+    print(tissue_name,"cargado")
+
+
+
 merged_data = pd.concat(data_frames)
 
-print(merged_data.head())
-
-long_data = pd.melt(merged_data.reset_index(), id_vars=['tissue'], var_name='Gene', value_name='Expression')
-
-print(long_data.head())
 
 
 
-# Perform ANOVA
-genes = merged_data.columns[:-1]  # Exclude the tissue column
-anova_results = {}
+tissue_paths = f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr"
 
-import scipy.stats as stats
-print(merged_data.head())
+# List files in directory
+files_list = os.listdir(tissue_paths)
 
-genes = [genes[0], genes[1]]  # Selects only 2 genes to test
+# Filter files that end with "predict.txt"
+predict_files = [file for file in files_list if file.endswith("predict.txt")]
 
-anova_results = {}
+# Initialize a variable to store the merged DataFrame progressively
+merged_data = None
 
-for gene in genes:
-    # Exclude rows with NA values for the current gene
-    non_na_data = merged_data[[gene, 'tissue']].dropna()
+# Process and merge each file progressively
+for tissue in predict_files:
+    file_path = os.path.join(tissue_paths, tissue)
     
-    # Debugging: Check the data
-    print(f"Data for gene {gene}:")
-    print(non_na_data.head())
-    print(non_na_data['tissue'].value_counts())
-
-    # Ensure that 'tissue' column is a Series
-    tissue_series = non_na_data['tissue']
-    if isinstance(tissue_series, pd.Series):
-        # Get unique tissue types
-        tissue_types = tissue_series.unique()
-        print(f"Tissue types for gene {gene}: {tissue_types}")
-
-        # Group gene expression levels by tissue type
-        expression_levels_by_tissue = [non_na_data[non_na_data['tissue'] == tissue][gene] for tissue in tissue_types]
-
-        for i, levels in enumerate(expression_levels_by_tissue):
-            print(f"Tissue {tissue_types[i]} - Number of samples: {len(levels)}")
-            print(f"Tissue {tissue_types[i]} - Variance: {np.var(levels)}")
+    try:
+        # Read the file into a DataFrame
+        tissue_pd = pd.read_csv(file_path, sep="\t", on_bad_lines='skip')
         
-        # Perform ANOVA if there are at least two groups to compare
-        if len(expression_levels_by_tissue) > 1:
-            try:
-                anova = stats.f_oneway(*expression_levels_by_tissue)
-                anova_results[gene] = anova.pvalue
-            except Exception as e:
-                print(f"Error for gene {gene}: {e}")
+        # Drop the 'FID' column if it exists
+        tissue_pd = tissue_pd.drop(["FID"], axis=1, errors='ignore')
+        
+        # Extract tissue name from file name
+        tissue_name = tissue.replace("mashr_", "").replace("_predict.txt", "")
+        
+        # Rename columns
+        new_columns = {col: f"{col}_{tissue_name}" if col != 'IID' else col for col in tissue_pd.columns}
+        tissue_pd.rename(columns=new_columns, inplace=True)
+        
+        # Print status
+        print(f"{tissue_name} loaded")
+        
+        # Merge the current DataFrame with the accumulated DataFrame
+        if merged_data is None:
+            merged_data = tissue_pd
         else:
-            anova_results[gene] = None  # No ANOVA performed if less than two groups
-    else:
-        print(f"'tissue' column is not a Series: {type(tissue_series)}")
+            merged_data = pd.concat([merged_data, tissue_pd], ignore_index=True)       
+    except Exception as e:
+        print(f"Error processing {tissue}: {e}")
+
+merged_data = pd.concat(data_frames)
+
+# hacer contraste columna a columna:
+for col in merged_data.columns:
+    col
     
-    print(f"terminado {gene} to go")
-
-# Save results
-anova_df = pd.DataFrame(list(anova_results.items()), columns=['Gene', 'p-value'])
-anova_df = anova_df.sort_values(by='p-value')
-print(anova_df.head())
 
 
 
+print(merged_data.head())
 
-long=len(genes)
+# todas las columnas menos el tejido
+genes = merged_data.columns[:-1]  
+genes = merged_data.columns[0:3]
+anova_results = {}
+
+long = len(genes)
+
 for gene in genes:
-    # Exclude rows with NA values for the current gene
     non_na_data = merged_data[[gene, 'tissue']].dropna()
-    
+
     # Group gene expression levels by tissue type
     expression_levels_by_tissue = [non_na_data[non_na_data['tissue'] == tissue][gene] for tissue in non_na_data['tissue'].unique()]
     
     # Perform ANOVA if there are at least two groups to compare
     if len(expression_levels_by_tissue) > 1:
-        anova = stats.f_oneway(*expression_levels_by_tissue)
-        anova_results[gene] = anova.pvalue
-    long=long-1
-    print("terminado",gene,long,"to go")
-
-# Save the p-value results in a DataFrame and sort by p-value
-anova_df = pd.DataFrame(list(anova_results.items()), columns=['Gene', 'p-value'])
-anova_df = anova_df.sort_values(by='p-value')
-
-print(anova_df.head())
-
-
-# Optional: Save the DataFrame to a CSV file
-anova_df.to_csv('anova_pvalues.csv', index=False)
-
-# Print the ordered DataFrame
-print(anova_df)
-
-
-
-
-
-
-
-
-
-path = "C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
-
-tissue_paths=f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr"
-
-files_list = os.listdir(tissue_paths)
-
-predict_files = [file for file in files_list if file.endswith("predict.txt")]
-
-data_frames = []
-
-tissue=predict_files[1]
-for tissue in predict_files:
-    tissue_pd=pd.read_csv(os.path.join(tissue_paths, tissue), sep="\t",  on_bad_lines='skip')
-    tissue_pd=tissue_pd.drop(["FID"], axis=1)
-    # quitamos el indice que esta ahora como headers
-    tissue_name = tissue.replace("mashr_", "").replace("predict.txt", "")
-    # Renombramos las columnas para que cada gen una tenga el nombre del tejido
-    tissue_pd.columns = [f"{col}_{tissue_name}" if col != 'FID' else col for col in tissue_pd.columns]
-    data_frames.append(tissue_pd)
-    print(tissue,"cargado")
-
-
-    
-    
-
-
-###### buenoo
-tissue=predict_files[1]
-tissue_pd=pd.DataFrame
-path = "C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
-
-tissue_paths=f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr"
-
-files_list = os.listdir(tissue_paths)
-
-predict_files = [file for file in files_list if file.endswith("predict.txt")]
-data_frames = []
-tissue_names = []
-# quitar
-
-for tissue in predict_files:
-    tissue_pd=pd.read_csv(os.path.join(tissue_paths, tissue), sep="\t",  on_bad_lines='skip')
-    tissue_pd=tissue_pd.drop(["FID", "IID"], axis=1)
-    means = tissue_pd.mean()
-    means_df = pd.DataFrame([means])
-    tissue_name = tissue.replace("mashr_", "").replace("_predict.txt", "")
-    means_df["tissue"]=tissue_name
-    data_frames.append(means_df)
-    tissue_names.append(tissue_name)
-    print(tissue_name,"cargado")
-    
-merged_data = pd.concat(data_frames)
-print(merged_data.head())
-
-print(merged_data["tissue"])
-
-genes = merged_data.columns[:-1]
-anova_results = {}
-
-tissue=tissue_names[1]
-gene=genes[1]
-
-for gene in genes:
-    merged_data[gene]
-    non_na_data = merged_data[[gene, 'tissue']].dropna()
-
-
-
-merged_data = pd.concat(data_frames)
-print(merged_data.head())
-print(merged_data["tissue"])
-
-# Perform ANOVA
-genes = merged_data.columns[:-1]  # Exclude the tissue column
-anova_results = {}
-
-# Save the p-value results in a DataFrame and sort by p-value
-anova_df = pd.DataFrame(list(anova_results.items()), columns=['Gene', 'p-value'])
-anova_df = anova_df.sort_values(by='p-value')
-
-# Optional: Save the DataFrame to a CSV file
-anova_df.to_csv('anova_pvalues.csv', index=False)
-
-# Print the ordered DataFrame
-print(anova_df)
-
-
-
-    for tissue in tissue_names:
-        
-        merged_data[merged_data["tissue"]== tissue]
-    anova = stats.f_oneway(*[merged_data[merged_data['tissue'] == tissue][gene] for tissue in merged_data['tissue'].unique()])
-    anova_results[gene] = anova.pvalue
-
-for gene in genes:
-    # Initialize an empty list to hold the data for each tissue
-    groups = []
-    # Group by tissue and get the values for the current gene
-    for tissue, group in merged_data.groupby('tissue'):
-        groups.append(group[gene].values)
-    # Perform ANOVA
-    anova = stats.f_oneway(*groups)
-    # Store the p-value in the dictionary
-    anova_results[gene] = anova.pvalue
-    
-    
-# Step 4: Save the p-value results in a DataFrame
-anova_df = pd.DataFrame(list(anova_results.items()), columns=['Gene', 'p-value'])
-
-# Step 5: Order the DataFrame from smallest to largest p-value
-anova_df = anova_df.sort_values(by='p-value')
-
-# Optional: Save the DataFrame to a CSV file
-anova_df.to_csv('anova_pvalues.csv', index=False)
-
-# Print the ordered DataFrame
-print(anova_df)
-
-
-
-tissue=predict_files[1]
-tissue_pd=pd.DataFrame
-path = "C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM"
-
-tissue_paths=f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr"
-
-files_list = os.listdir(tissue_paths)
-
-predict_files = [file for file in files_list if file.endswith("predict.txt")]
-data_frames = []
-
-for tissue in predict_files:
-    tissue_pd=pd.read_csv(os.path.join(tissue_paths, tissue), sep="\t",  on_bad_lines='skip')
-    tissue_pd=tissue_pd.drop(["FID", "IID"], axis=1)
-    tissue_pd=tissue_pd.T
-    # quitamos el indice que esta ahora como headers
-    tissue_pd.columns = tissue_pd.iloc[0]
-    tissue_pd = tissue_pd[1:]
-    means = tissue_pd.mean()
-    means_df = pd.DataFrame([means])
-    tissue_name = tissue.replace("mashr_", "").replace("predict.txt", "")
-    means_df["tissue"]=tissue_name
-    data_frames.append(means_df)
-    # Renombramos las columnas para que cada gen una tenga el nombre del tejido
-    tissue_pd.columns = [f"{col}_{tissue_name}" if col != 'IID' else col for col in tissue_pd.columns]
-    data_frames.append(means_df)
-    
-    print(tissue,"cargado")
-  
-merged_data = pd.concat(data_frames, axis=1, join='inner')
-print(merged_data.head())
-
-import scipy.stats as stats
-
-def clean_column_name(column_name):
-    """
-    Clean and standardize the column name.
-    Extracts the part of the column name after the second underscore,
-    converts it to lowercase, and removes any trailing underscores.
-    """
-    parts = column_name.split('_')
-    if len(parts) > 2:
-        tissue_name = '_'.join(parts[2:]).rstrip('_')
-        tissue_name = tissue_name.lower()
-        tissue_name = tissue_name.strip()
-        return tissue_name
-    return column_name
-
-# Clean all column names
-cleaned_columns = [clean_column_name(col) for col in merged_data.columns]
-
-# Store cleaned column names as tissue_names
-tissue_names = set(cleaned_columns)
-
-def perform_anova(expression_values):
-    """Perform one-way ANOVA."""
-    if len(expression_values) < 2:
-        return None, None  # Need at least two groups
-    try:
-        f_stat, p_value = stats.f_oneway(*expression_values)
-        return f_stat, p_value
-    except Exception as e:
-        print(f"ANOVA error: {e}")
-        return None, None
-
-# Prepare DataFrame to store ANOVA results
-anova_results = pd.DataFrame(columns=['Gene', 'F-statistic', 'p-value'])
-
-# List to hold results before concatenation
-results_list = []
-
-# Perform ANOVA for each gene
-for gene in merged_data.index:
-    gene_data = merged_data.loc[gene]
-    # Extract expression values for each tissue
-    tissue_values = []
-    for tissue in tissue_names:
-        cols = [col for col in merged_data.columns if tissue in col]
-        values = gene_data[cols].values
-        if len(values) > 1:  # Ensure there are enough data points
-            tissue_values.append(values)
-        else:
-            print(f"Not enough data for tissue {tissue} for gene {gene}")
-    if len(tissue_values) > 1:  # Ensure there are at least two groups to compare
-        f_stat, p_value = perform_anova(tissue_values)
-        if f_stat is not None:
-            results_list.append({'Gene': gene, 'F-statistic': f_stat, 'p-value': p_value})
+        try:
+            anova = stats.f_oneway(*expression_levels_by_tissue)
+            anova_results[gene] = anova.pvalue
+        except Exception as e:
+            print(f"Error for gene {gene}: {e}")
     else:
-        print(f"Not enough groups to perform ANOVA for gene {gene}")
+        anova_results[gene] = None  # No ANOVA performed if less than two groups
+    
+    long -= 1
+    print(f"terminado {gene}, {long} to go")
 
-# Convert results list to DataFrame and concatenate
-anova_results = pd.concat([pd.DataFrame(results_list)], ignore_index=True)
-
-# Print the result
-print(anova_results)
+# Save results
+anova_df = pd.DataFrame(list(anova_results.items()), columns=['Gene', 'p-value'])
+anova_df = anova_df.sort_values(by='p-value')
+print(anova_df.head())

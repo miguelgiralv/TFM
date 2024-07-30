@@ -1,0 +1,14 @@
+PLINK v2.00a6LM 64-bit Intel (4 Jul 2024)
+Options in effect:
+  --bfile /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/results/PRS/fullgenome_plink_2
+  --list-duplicate-vars
+
+Hostname: DESKTOP-RM72EL3
+Working directory: /mnt/c/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM
+Start time: Tue Jul 30 15:00:54 2024
+
+Error: --list-duplicate-vars is retired.  We recommend --set-all-var-ids +
+--rm-dup for variant deduplication.
+For more info, try "plink2 --help <flag name>" or "plink2 --help | more".
+
+End time: Tue Jul 30 15:00:54 2024

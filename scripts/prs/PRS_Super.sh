@@ -1,7 +1,9 @@
 
 
 salloc -J prs_join -p day -N 2 -c 4
-# convertimos a plink2 para poder unir todo el genoma (tiene variantes muy largas que plink 1.9 no soporta):
+
+
+# convertimos nuestros archivos de plink a plink2 para poder unir todo el genoma (tiene variantes muy largas que plink 1.9 no soporta):
 for chr in {1..22} X; do
 ./plink2 --bfile "imputed_data_chr${chr}" --make-pgen --out "pgen/imputed_data_chr${chr}"
 echo "done chr${chr}"

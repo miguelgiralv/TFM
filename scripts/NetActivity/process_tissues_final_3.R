@@ -4,6 +4,8 @@ library(limma)
 library(SummarizedExperiment)
 library(tidyverse)
 library(tibble)
+library(dplyr)
+
 
 
 path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/" # el path al repositorio
@@ -389,15 +391,16 @@ standardize_and_run_logistic_regression(score_tissue_list, "Brain_Hippocampus", 
 #cargamos el archivo de plink de scores de prs de PGS004146
 # meter el sexo en el modelo tambien
 
-PRS <- read.table(paste0(path, "results/PRS/PGS004146_hmPOS_GRCh37/output_PGS004146_2_2.sscore"), header = TRUE, sep = "", stringsAsFactors = FALSE)
+PRS <- read.table(paste0(path, "results/PRS/PGS004146_hmPOS_GRCh37/output_PGS004146_5.sscore"), header = TRUE, sep = "\t", stringsAsFactors = FALSE, comment.char = "")
 
 head(PRS)
 
 PRS$PHENO1 <- as.factor(PRS$PHENO) 
 PRS$SCORE1_AVG <- as.numeric(PRS$SCORE)  
 
-PRS <- PRS %>% select(-c(FID, IID, ALLELE_CT, NAMED_ALLELE_DOSAGE_SUM))
+columns_to_remove <- c("X.FID", "IID", "ALLELE_CT", "NAMED_ALLELE_DOSAGE_SUM")
 
+PRS <- PRS[ , !(colnames(PRS) %in% columns_to_remove)]
 filtered_data$DiseaseStatus <- ifelse(merged_data$DiseaseStatus == "control", 0, 1)
 # binarizamos
 PRS$PHENO1<-ifelse(PRS$PHENO1 == 1, 0, 1)
@@ -425,17 +428,30 @@ odds_df <- data.frame(
 #cargamos el archivo de plink de scores de prs de PGS000054
 # meter el sexo en el modelo tambien
 
-PRS2 <- read.table(paste0(path, "results/PRS/PGS000054_hmPOS_GRCh37/output_PGS000054_2.sscore"), header = TRUE, sep = "", stringsAsFactors = FALSE)
+PRS2 <- read.table(paste0(path, "results/PRS/PGS000054_hmPOS_GRCh37/output_PGS000054.sscore"), header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 
+# Specify the path to your file
+path <- "/path/to/your/directory/"
+
+# Read the file with the correct headers
+PRS2 <- read.table(paste0(path, "results/PRS/PGS000054_hmPOS_GRCh37/output_PGS000054.sscore"), 
+                   header = TRUE, sep = "\t", stringsAsFactors = FALSE, comment.char = "")
+
+
+# Display the first few rows of the DataFrame
 head(PRS2)
+
 
 PRS2$PHENO1 <- as.factor(PRS2$PHENO) 
 PRS2$SCORE1_AVG <- as.numeric(PRS2$SCORE)  
 
-PRS2 <- PRS2 %>% select(-c(FID, IID, ALLELE_CT, NAMED_ALLELE_DOSAGE_SUM))
+columns_to_remove <- c("X.FID", "IID", "ALLELE_CT", "NAMED_ALLELE_DOSAGE_SUM")
+
+PRS2 <- PRS2[ , !(colnames(PRS2) %in% columns_to_remove)]
 
 PRS2$SCORE1_AVG<-scale(PRS2$SCORE1_AVG)
-model2 <- glm(PHENO1 ~ ., data = PRS2, family = binomial)
+model2 <- glm(PHENO1 ~ ., data = PRS2, family = binomial) 
+# ¿METER TAMBIEN EL SEXO?
 # Extract coefficients and their confidence intervals
 summary(model2)
 exp(coef(model2))

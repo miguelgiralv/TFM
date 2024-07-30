@@ -8,25 +8,38 @@ prs_file = pd.read_csv(f"{path}/data/PRS/PGS004146_hmPOS_GRCh37_2.txt", sep="\t"
                          
 # para PGS004146, nos quedaremos con chr:pos:ref:alt 
 prs_file = pd.read_csv(f"{path}/data/PRS/PGS004146_hmPOS_GRCh37_2.txt", sep="\t")
+
+                    
+duplicated_values2 = prs_file[prs_file.duplicated('rsID', keep=False)]
+
+
+
 prs_file['Concatenated'] = prs_file['chr_name'].astype(str) + ':' + \
-                     prs_file['chr_position'].astype(str) + ':' + \
+                     prs_file['hm_pos'].astype(str) + ':' + \
                      prs_file['other_allele'] + ':' + \
-                     prs_file['effect_allele']               
+                     prs_file['effect_allele']    
                      
+          
+
 columns_to_keep = ['Concatenated', 'chr_name', 'chr_position', 'effect_allele', 'other_allele',
        'effect_weight', 'hm_source', 'hm_rsID', 'hm_chr', 'hm_pos',
        'hm_inferOtherAllele']
 
 prs_file2 = prs_file[columns_to_keep]
  
-prs_file2.to_csv(f"{path}/data/PRS/PGS004146_hmPOS_GRCh37_3.txt",sep="\t", index=False)
+prs_file2.to_csv(f"{path}/data/PRS/PGS004146_hmPOS_GRCh37_4.txt",sep="\t", index=False)
 
 # para PGS000054, nos quedaremos con chr:pos 
 
 prs_file3 = pd.read_csv(f"{path}/data/PRS/PGS000054_hmPOS_GRCh37_2.txt", sep="\t")
-                        
+
+prs_file3['hm_inferOtherAllele'] = prs_file3['hm_inferOtherAllele'].str.replace(r'/', '', regex=True)
+
 prs_file3['Concatenated'] = prs_file3['chr_name'].astype(str) + ':' + \
-                        prs_file3['chr_position'].astype(str) 
+                     prs_file3['hm_pos'].astype(str) + ":" + \
+                     prs_file3['effect_allele'] + ":" + \
+                     prs_file3["hm_inferOtherAllele"].astype(str)
+                                 
                         
 columns_to_keep = ['Concatenated', 'chr_name', 'chr_position', 'effect_allele', 'effect_weight',
        'OR', 'hm_source', 'hm_rsID', 'hm_chr', 'hm_pos', 'hm_inferOtherAllele',
