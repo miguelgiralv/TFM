@@ -24,7 +24,6 @@ $path/software/plink2 --pmerge-list $path/results/imputado/extracted/plink/pgen/
 # volvemos a convertirlo a plink1 (y así aprovechamos el archivo fam que teníamos antes con informacion fenotipica en el plink original) 
 $path/software/plink2 --pfile $path/results/PRS/full_genome --make-bed --out $path/results/PRS/fullgenome_plink
 
-
 # calculamos los prs de PGS000054 (hemos sustituido los rsid por pos:chr:ref:alt en un script de python "process_prs"):
 $path/software/plink2 --bfile $path/results/PRS/fullgenome_plink --score $path/data/PRS/PGS000054_hmPOS_GRCh37_5.txt 1 4 5 header --out  $path/results/PRS/PGS000054_hmPOS_GRCh37/output_PGS000054
 
