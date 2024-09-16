@@ -53,102 +53,48 @@ for element in len(data_frames):
 df = df.loc[:, ~df.columns.duplicated()]
 
 ############################ ALTERNATIVA CON TODOS LOS
+# emtemos un contador para tener todos los genes distintos
 number = 1
-all_correlations = {}  # Initialize as a dictionary to store correlation matrices for each gene
-# Iterate through each data frame in data_frames
+#  Creamos un diccionario vacio para almacenar una matriz de correlacion para cada gen
+all_correlations = {}  
+# Iteramos por todos los dfs de expresion genica entodos  los tejidos
 for df_index, df in enumerate(data_frames):
-    # Iterate through the columns (genes) of the current data frame
+    # Loop por los genes/columnas del tejido
     for col_name in df.columns:
         if col_name != 'IID' and col_name != 'tissue' and col_name not in all_correlations:
-            # Create an empty dataframe to store gene data across tissues
+            # df vacio para m,eter un gen
             gene_df = pd.DataFrame()
-            # Iterate over all data frames and collect data for this gene
+            # cogemos la expresion de ese gen en todos los tejidos
             for i, tissue_df in enumerate(data_frames):
                 tissue_name = tissue_names[i]
                 if col_name in tissue_df.columns:
                     gene_tissue = f"{col_name}_{tissue_name}"
                     gene_df[gene_tissue] = tissue_df[col_name]            
-            # Calculate the correlation matrix for this gene
+            # Matriz de correlacion para el df
             if not gene_df.empty:
                 correlation_matrix = gene_df.corr()
-                # Rename the index to just tissue names
                 new_index = [name.split('_', 1)[-1] for name in correlation_matrix.index]
                 correlation_matrix.index = new_index
-                # Initialize the key for the gene if it doesn't exist in all_correlations
                 if col_name not in all_correlations:
                     all_correlations[col_name] = []
-                # Append the correlation matrix for this gene
+                # lo metemos en el  diccionario con el nomnbre del gen
                 all_correlations[col_name].append(correlation_matrix)
-            # Increment and print progress
+        
             number += 1
             print(f"Processed gene {col_name}, count: {number}")
 
 
+flattened_correlations = {}
 
+for gene, matrices in all_correlations.items():
+    if len(matrices) > 1:
+        flattened_correlations[gene] = pd.concat(matrices, axis=0)
+    else:
+        flattened_correlations[gene] = matrices[0]
 
+merged_df = pd.concat(flattened_correlations.values(), axis=1)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-number = 1
-all_correlations = []
-for df_index, df in enumerate(data_frames):
-    # Iterate over all columns of genes in the current DataFrame
-    for col_name in df.columns:
-        if col_name != 'IID' and col_name != 'tissue':
-            # Create a DataFrame to store data for the current gene across all tissues
-            gene_df = pd.DataFrame()            
-            for i, tissue_df in enumerate(data_frames):
-                tissue_name = tissue_names[i]
-                if col_name in tissue_df.columns:
-                    gene_tissue = f"{col_name}_{tissue_name}"
-                    gene_df[gene_tissue] = tissue_df[col_name]            
-            # Calculate the correlation matrix for the current gene
-            if not gene_df.empty:
-                correlation_matrix = gene_df.corr()
-                new_index = [name.split('_', 1)[-1] for name in correlation_matrix.index]
-                correlation_matrix.index = new_index
-                correlation_matrix.columns = new_index
-                all_correlations.append(correlation_matrix)
-            number += 1
-            print(number)
-
-# Combine all correlation matrices into a single DataFrame
-# Use MultiIndex for columns to keep track of different genes
-combined_correlations = pd.concat(all_correlations, axis=1, keys=[f"Gene_{i}" for i in range(len(all_correlations))])
-
-len(combined_correlations)
-
-# Drop duplicate columns and rows
-# Flatten the MultiIndex columns to a single level if needed
-combined_correlations.columns = combined_correlations.columns.map('_'.join)
-combined_correlations = combined_correlations.loc[~combined_correlations.index.duplicated(keep='first')]
-combined_correlations = combined_correlations.loc[:, ~combined_correlations.columns.duplicated(keep='first')]
-
-print("Combined correlations matrix with duplicates dropped:")
-print(combined_correlations)
-
-combined_correlations.head()
-
-
+transposed_df = merged_df.T
 
 # COMPROBAR QUE ES LO QUE QUERIA CARLOS Y LUEGO HACER LOOP POR TODOS LOS TEJIDOS PARA NO DEJARME NINGUN GEN, LUEGO HACER MERGE QUITANDO LOS GENES REDUNDANTES
 # pendiente
@@ -159,13 +105,11 @@ transposed_df.to_csv(f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr/corr
 transposed_df=pd.read_csv(f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr/correlation.txt", sep="\t")
 
 def split_gene_tissue(value):
-    # Split only at the first underscore
     parts = value.split('_', 1)
     gene = parts[0]
     tissue = parts[1] if len(parts) > 1 else None
     return gene, tissue
 
-# Apply the function to split the column into 'Gene' and 'Tissue'
 transposed_df[['Gene', 'Tissue']] = transposed_df['Unnamed: 0'].apply(lambda x: pd.Series(split_gene_tissue(x)))
 
 transposed_df.drop(columns=['Unnamed: 0'], inplace=True)
@@ -176,13 +120,10 @@ mean_correlation_matrix = pd.DataFrame(index=tissues, columns=tissues)
 
 for tissue1 in tissues:
     for tissue2 in tissues:
-        # Filter the data for the first tissue
         tissue1_data = transposed_df[transposed_df['Tissue'] == tissue1]
-        
-        # Extract the correlations for tissue2
+        # Extraemos las correlaciones 
         correlations = tissue1_data[tissue2]
-        
-        # Calculate the mean correlation for the gene in tissue1 with its expression in tissue2
+        # Calculamos correlacion media entre tissue 1 y 2
         mean_correlation_matrix.loc[tissue1, tissue2] = correlations.mean()
 
 mean_correlation_matrix = mean_correlation_matrix.astype(float)
@@ -192,18 +133,17 @@ mean_correlation_matrix.to_csv(f"{path}/results/predictXcan/test/vcf_1000G_hg37_
 mean_correlation_matrix=pd.read_csv(f"{path}/results/predictXcan/test/vcf_1000G_hg37_mashr/correlation_mean_matrix.txt", sep="\t")
 
 mean_correlation_matrix.set_index('Unnamed: 0', inplace=True)
-# Reorder columns alphabetically
+
 sorted_columns = sorted(mean_correlation_matrix.columns)
 mean_correlation_matrix = mean_correlation_matrix[sorted_columns]
-# Sort rows by index (if needed)
 mean_correlation_matrix = mean_correlation_matrix.sort_index()
 
 plt.figure(figsize=(30, 30))
 ax=sns.heatmap(mean_correlation_matrix, annot=False, cmap='Reds', vmin=0, vmax=1,square=True)
 ax.xaxis.set_label_position('top')
 ax.xaxis.tick_top()
-plt.xticks(rotation=90)  # Rotate x-axis labels if needed for better readability
-plt.yticks(rotation=0)   # Keep y-axis labels horizontal
+plt.xticks(rotation=90)  
+plt.yticks(rotation=0)  
 plt.xlabel("Tissues", fontsize=18, labelpad=40)
 plt.ylabel("Tissues", fontsize=18, labelpad=40)
 plt.show()
@@ -217,16 +157,17 @@ mean_correlation_matrix_melt = mean_correlation_matrix_filter.melt(var_name='Tis
 print(mean_correlation_matrix_melt.head())
 
 # eliminamos los genes que se correlacionan con su mismo tejido (da 1)
-
 transposed_df2=transposed_df
 columns = transposed_df2.columns[transposed_df2.columns != 'Unnamed: 0']
-# Function to replace values
+# creamos una funcion para quitar todos los genes que se expresan en ese tejido para quitar los valores con correlacion 1 pq es el mismo gen
 def replace_values(row, columns):
     for col in columns:
         if row['Unnamed: 0'].endswith(f'_{col}'):
             row[col] = pd.NA
     return row
-# Apply the function to each row
+
+# Aplicamos a cada fila
+transposed_df2
 transposed_df2 = transposed_df2.apply(lambda row: replace_values(row, columns), axis=1)
 transposed_df2_filter = transposed_df2.drop(columns=['Unnamed: 0'])
 transposed_df2_filter = transposed_df2_filter[sorted(transposed_df2_filter.columns)]
@@ -237,7 +178,7 @@ transposed_df2_melt.to_csv(f"{path}/results/predictXcan/test/vcf_1000G_hg37_mash
 # y lo representamos en un boxplot
 plt.figure(figsize=(12, 8))
 sns.boxplot(x='Tissue', y='Correlation', data=transposed_df2_melt)
-plt.xticks(rotation=90)  # Rotate x labels for better readability
+plt.xticks(rotation=90)  
 plt.title('Correlation of gene expression accross Tissues', fontsize = 20)
 plt.xlabel("Tissues", fontsize=16)
 plt.ylabel("Correlation", fontsize=18)
@@ -255,8 +196,8 @@ plt.figure(figsize=(12, 10))
 ax=sns.heatmap(filtered_matrix, annot=False, cmap='Reds', vmin=0, vmax=1)
 ax.xaxis.set_label_position('top')
 ax.xaxis.tick_top()
-plt.xticks(rotation=90)  # Rotate x-axis labels if needed for better readability
-plt.yticks(rotation=0)   # Keep y-axis labels horizontal
+plt.xticks(rotation=90)  
+plt.yticks(rotation=0)   
 plt.xlabel("Tissues", fontsize=18, labelpad=30)
 plt.ylabel("Tissues", fontsize=18, labelpad=30)
 plt.show()
@@ -286,11 +227,11 @@ selected_columns = [
     "Whole_Blood"
 ]
 
-# Check if the columns exist in the DataFrame
+# comprobamos que las columnas existen
 existing_columns = [col for col in selected_columns if col in mean_correlation_matrix.columns]
 print("Columns selected:", existing_columns)
 
-# Filter the DataFrame to include only the selected columns
+# Seleccionamos las columnas de los tejidos selected
 mean_correlation_matrix_filtered = mean_correlation_matrix[['Unnamed: 0'] + existing_columns]
 
 filtered_df = mean_correlation_matrix_filtered[mean_correlation_matrix_filtered['Unnamed: 0'].isin(selected_columns)]
@@ -298,13 +239,12 @@ filtered_df = mean_correlation_matrix_filtered[mean_correlation_matrix_filtered[
 filtered_df.set_index('Unnamed: 0', inplace=True)
 filtered_df = filtered_df.sort_index()
 
-# Ensure the 'Unnamed: 0' column is set as the index for the heatmap
 plt.figure(figsize=(12, 10))
 ax=sns.heatmap(filtered_df, annot=False, cmap='Reds', vmin=0, vmax=1)
 ax.xaxis.set_label_position('top')
 ax.xaxis.tick_top()
-plt.xticks(rotation=90)  # Rotate x-axis labels if needed for better readability
-plt.yticks(rotation=0)   # Keep y-axis labels horizontal
+plt.xticks(rotation=90)  
+plt.yticks(rotation=0)   
 plt.xlabel("Tissues", fontsize=18, labelpad=30)
 plt.ylabel("Tissues", fontsize=18, labelpad=30)
 plt.show()

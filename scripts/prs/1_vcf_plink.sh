@@ -6,7 +6,7 @@ for chr in {1..22} X; do
     $path/software/plink --vcf $path/results/imputado/extracted/chr${chr}.dose.vcf.gz --make-bed --out $path/results/imputado/extracted/plink/imputed_data_chr${chr}
 done
 
-######### a partir de aqui lo hice en el supercomputador (probar en local a ver si funciona)
+######### a partir de aqui lo hice en el supercomputador 
 
 # convertimos nuestros archivos de plink a plink2 para poder unir todo el genoma (tiene variantes muy largas que plink 1.9 no soporta):
 for chr in {1..22} X; do

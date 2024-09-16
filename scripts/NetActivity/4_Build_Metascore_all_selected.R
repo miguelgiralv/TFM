@@ -95,7 +95,7 @@ Metascore<-function(score_tissue_list,tissue_names)
   # almacenaremos los gos y su tejido en orden en una lista
   
   merged_data_list <- list()
-  
+
   for (fold in 1:length(all_pvalues_list_filtered)) 
   {
     filtered_go <- all_pvalues_list_filtered[[fold]]
@@ -145,22 +145,14 @@ Metascore<-function(score_tissue_list,tissue_names)
     coef_summary <- as.data.frame(summary(model)$coefficients)
     coef_summary<-rownames_to_column(coef_summary, "Predictors")
     coef_summary[["Pr(>|z|)"]]<-as.numeric(coef_summary[["Pr(>|z|)"]])                                 
-    coef_summary[["Estimate"]]<-as.numeric(coef_summary[["Estimate"]])                                 
-    coef_summary <- coef_summary[coef_summary[["Pr(>|z|)"]] < 0.10 | coef_summary[["Predictors"]]=="(Intercept)", ] # ponemos un umbral de Pr(>|z|) de 0.10
-    
-    # eliminamos aquellas filas donde el error es muy alto (si es mayor que 3/2 del estimate en valor absoluto)
-    ###################################  
-    rows_to_keep <- abs(coef_summary[["Estimate"]]) > (coef_summary[["Std. Error"]] * 1.5) 
-    coef_summary <- coef_summary[rows_to_keep |  coef_summary[["Predictors"]]=="(Intercept)", ]
+    coef_summary[["Estimate"]]<-as.numeric(coef_summary[["Estimate"]])
+    # ponemos un umbral de Pr(>|z|) de 0.10
+    coef_summary <- coef_summary[coef_summary[["Pr(>|z|)"]] < 0.10 | coef_summary[["Predictors"]]=="(Intercept)", ] 
+
     # y lo almacenamos en la lista
     merged_data_list[[paste0("fold_", fold)]] <- coef_summary
     print(paste("Fold", fold, "completed and added to merged_data_list."))
   }
-  
-  # merged_data_list contiene los estimates de metascore (con los que se construye el metascore mediante una suma ponderada)
-  merged_data_list$fold_2$Predictors <- gsub('\`', '', merged_data_list$fold_2$Predictors)
-  split_result <- strsplit(merged_data_list$fold_2$Predictors, "_", fixed = TRUE)
-  tissue_name <- paste(split_result[-1], collapse = "_")
   
   ####AHORA HAREMOS EL METASCORE
   # primero extraer los scores de GSAS de los terminos GO para cada muestra
@@ -244,8 +236,10 @@ Metascore<-function(score_tissue_list,tissue_names)
       CI_Lower = exp(conf_int[, 1]),
       CI_Upper = exp(conf_int[, 2]))
     odds_df<-cbind(odds_df, coef_summary)
-    Metascore_test_list[[paste0("fold_",fold)]]<-list(odds_ratio=odds_df, 
-                                                      GOs_metascore_regression = models_fold, metascore = fold_metascore_df)
+    Metascore_test_list[[paste0("fold_",fold)]]<-list(reg_log_model = model_metascore,
+                                                      odds_ratio=odds_df, 
+                                                      GOs_metascore_regression = models_fold, 
+                                                      metascore = fold_metascore_df)
   }
 return(Metascore_test_list)
 }
@@ -273,6 +267,7 @@ Metascore_test_list_all[["fold_3"]]$odds_ratio
 Metascore_test_list_all[["fold_4"]]$odds_ratio
 Metascore_test_list_all[["fold_5"]]$odds_ratio
 
+
 # calculamos ahora las performance metrics de los dos metascores
 performance_metrics_calculator<-function(Metascore_test_list)
 {
@@ -284,7 +279,9 @@ for (fold in 1:5) {
   # calculamos auc y roc
   roc_obj <- roc(metascore_df$DiseaseStatus, metascore_df$metascore)
   auc_value <- auc(roc_obj)
-  predicted <- ifelse(metascore_df$metascore > 0.5, 1, 0)
+  reg_log_model<-Metascore_test_list[[paste0("fold_", fold)]][["reg_log_model"]]
+  predicted_probs <- predict(reg_log_model, fold_results$metascore, type = "response")
+  predicted <- ifelse(predicted_probs > 0.5, 1, 0)
   # Calculamos matriz de confusion
   confusion <- confusionMatrix(factor(predicted), factor(metascore_df$DiseaseStatus))
   # Extraemos las metricas
@@ -325,9 +322,6 @@ return(Metascore_test_list)
 
 Metascore_test_list_all<-performance_metrics_calculator(Metascore_test_list_all)
 Metascore_test_list_selected<-performance_metrics_calculator(Metascore_test_list_selected)
-rm(Metascore_test_list_all)
 
 save(Metascore_test_list_all, file = paste0(path, "results/netactivity/Metascore_TODO.RData"))
-
-# cargo los datos seleccionados y ejecuto todo otra vez
 save(Metascore_test_list_selected, file = paste0(path, "results/netactivity/Metascore_selected.RData"))
