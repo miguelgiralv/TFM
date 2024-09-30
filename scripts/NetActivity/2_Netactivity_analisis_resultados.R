@@ -3,6 +3,7 @@ library(SummarizedExperiment)
 library(tidyverse)
 library(patchwork)
 library(limma)
+library(cowplot)
 
 path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/" # el path al repositorio
 
@@ -32,7 +33,7 @@ pvalue_boxplot<-function(score_tissue_list)
     } else {
       model_score <- model.matrix(~ DiseaseStatus + Sex, colData(score_tissue))
     }
-
+    
     fit <- lmFit(assay(score_tissue), model_score) %>% eBayes()
     
     topTab_tissue <- topTable(fit, coef = 2, n = Inf)
@@ -85,17 +86,21 @@ pvalue_boxplot<-function(score_tissue_list)
             axis.title.y = element_text(size = 12),  
             legend.text = element_text(size = 11),  
             legend.title = element_text(size = 12)) 
-
-  plot_list[[j]] <- plot
+    
+    plot_list[[j]] <- plot
   }
   
   combined_plot <- wrap_plots(plot_list, guides = "collect") +
     plot_layout(guides = 'collect') &
-    theme(legend.position = "right")  
- 
+    theme(legend.position = "right")
+  
+  combined_plot_with_label <- ggdraw() +
+    draw_plot(combined_plot) +  # The combined boxplot
+    draw_label("B", x = 0.02, y = 0.98, hjust = 0, vjust = 1, size = 15)  # Single "A" label in top-left
+  
   # extraemos el summarisedexperiment de uno de los tejidos de interes (que no sea tejido de organos sexuales)
   complete_odds_df<-data.frame()
-    
+  
   for (k in 1:nrow(all_pvalues_2))
   {
     tissue_name<-all_pvalues_2$tissue[[k]]
@@ -149,19 +154,20 @@ pvalue_boxplot<-function(score_tissue_list)
     
     complete_odds_df <- rbind(complete_odds_df, odds_df)
   }
-  
+  # Create boxplots for significant GO terms
   boxplot_list <- list()
-  
-  for (l in 1:nrow(all_pvalues_2))
-  {
-    tissue_name<-all_pvalues_2$tissue[[l]]
-    GO_term<-all_pvalues_2$GO[[l]]
+  color_palette <- c("control" = "#1f77b4",  
+                     "AD" = "#ff7f0e")    
+  for (l in 1:nrow(all_pvalues_2)) {
+    tissue_name <- all_pvalues_2$tissue[[l]]
+    GO_term <- all_pvalues_2$GO[[l]]
     
-    tissue_score<-score_tissue_list[[tissue_name]]
+    tissue_score <- score_tissue_list[[tissue_name]]
     
-    plot<-data.frame(Expression = as.vector(assay(tissue_score)[GO_term, ]),
-                       cases=tissue_score$DiseaseStatus) %>%
+    plot <- data.frame(Expression = as.vector(assay(tissue_score)[GO_term, ]),
+                       cases = tissue_score$DiseaseStatus) %>%
       ggplot(aes(x = cases, y = Expression, col = cases)) +
+      scale_color_manual(values = color_palette) +  # Apply custom colors
       geom_boxplot() +
       theme_bw() + 
       coord_cartesian(ylim = c(-3, 2)) +
@@ -171,26 +177,32 @@ pvalue_boxplot<-function(score_tissue_list)
       theme(axis.text.x = element_blank(),
             axis.title.y = element_text(size = 16), 
             legend.position = "right") +
-      ggtitle(paste0(GO_term,"\n", " ", gsub("_", " ", tissue_name))) # añadimos \n para el selected 
-      
-      boxplot_list[[l]] <- plot
+      ggtitle(paste0(GO_term, "\n", gsub("_", " ", tissue_name))) 
+    
+    boxplot_list[[l]] <- plot
   }
   
+  # Combine the boxplots into a grid using patchwork
   combined_boxplot <- wrap_plots(boxplot_list, guides = "collect") +
     plot_layout(guides = 'collect') &
     theme(legend.position = "right", 
           legend.text = element_text(size = 14),  
           legend.title = element_text(size = 16)) 
   
-  print(combined_plot)
-  print(combined_boxplot)
+  # Use cowplot to add the label "A" outside the entire plot grid
+  combined_boxplot_with_label <- ggdraw() +
+    draw_plot(combined_boxplot) +  # The combined boxplot
+    draw_label("A", x = 0.02, y = 0.98, hjust = 0, vjust = 1, size = 15)  # Single "A" label in top-left
   
+  # Print the final plot with the label
+  print(combined_plot_with_label)
   return(list(
     linear_reg = all_pvalues_2,
     log_reg = complete_odds_df,
-    combined_plot,
-    combined_boxplot))
+    combined_plot_with_label,
+    combined_boxplot_with_label))
 }
+
 
 
 load(paste0(path,  "results/netactivity/se_list_curated_TODO.RData")) # netactivity ejecutar todo
@@ -206,10 +218,10 @@ box_all<-all_tissues_p_value[[4]]
 # guardamos la regresion lineal para analizar los genes de estos GOs más adelante 
 save(lin_analysis,file=paste0(path,  "results/netactivity/linear_reg.RData")) 
 
-plot_all<-plot_all +   labs(title = "Genes weights for all tissues")
+ggsave(paste0(path,"figures/netactivity_images/boxplot_all_tissues.png"), plot = box_all, width = 9, height = 6, dpi = 400)
 
 ggsave(paste0(path, "figures/netactivity_images/plotbar_all_tissues.png"), plot = plot_all, width = 9, height = 6, dpi = 300)
-ggsave(paste0(path, "figures/netactivity_images/boxplot_all_tissues.png"), plot = box_all, width = 8, height = 5.14, dpi = 300)
+
 
 # Ahora representamos los GOs en regresion lineal
 

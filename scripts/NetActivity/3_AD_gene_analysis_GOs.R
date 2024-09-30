@@ -8,8 +8,9 @@ path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Reposito
 
 tissue_path="results/predictXcan/test/vcf_1000G_hg37_mashr/"
 
-load(paste0(path,  "results/netactivity/linear_reg.RData")) # netactivity ejecutar todo
+load(paste0(path,  "results/netactivity/linear_reg.RData"))
 
+load(paste0(path,  "results/netactivity/se_list_curated_TODO.RData")) # netactivity ejecutar todo
 
 # Comprobamos ahora cuales son los genes detectados en estos GOs y si entre ellos 
 # están los que identificamos en el analisis diferencial de expresion
@@ -78,4 +79,18 @@ combined_genes_bibliography <- unique(c(previous_genes, additional_genes))
 common_genes <- intersect(all_genes_merge, combined_genes_bibliography)
 common_genes
 # "BCL3" "MEF2C" "ADAM17" "GRN" "IGF1R" 
+
+# numero de genes totales que tomo como input netactivity:
+all_genes_list<-list()
+
+for (i in  1:nrow(lin_analysis))
+{
+  GO<-lin_analysis$GO[i]
+  tissue<-lin_analysis$tissue[i]
+  tissue_score<-score_tissue_list[[tissue]]
+  index<-which(rownames(tissue_score) == GO)
+  gene_list<-rowData(tissue_score)[[4]][[index]]
+  all_genes_list[[GO]] <- gene_list
+}
+
 

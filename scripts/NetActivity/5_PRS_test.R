@@ -81,5 +81,5 @@ PRS2 <- read.table(paste0(path, "results/PRS/PGS000054_hmPOS_GRCh37/output_PGS00
 PRS_results_general<-process_PRS(PRS1)
 PRS_results_hispana<-process_PRS(PRS2)
 
-save(PRS_results_general, file = paste0(path,  "results/PRS.RData"))
-save(PRS_results_hispana, file = paste0(path,  "results/PRS.RData"))
+save(PRS_results_general, file = paste0(path,  "results/PRS1.RData"))
+save(PRS_results_hispana, file = paste0(path,  "results/PRS2.RData"))

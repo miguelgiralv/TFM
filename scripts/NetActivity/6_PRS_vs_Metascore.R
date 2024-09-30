@@ -4,16 +4,19 @@ library(dplyr)
 library(caret)
 library(grid)
 library(pROC)
+library(gridExtra)
+library(ggplotify)
 
 # el path al repositorio
 
 path="C:/Users/Miguel/Documents/UNIVERSIDAD/6_MASTER_BIOINFORMATICA/TFM/Repositorio/TFM/" 
 
-# el nuevo creado
+# cargamos nuestros datos
+load(paste0(path,  "results/netactivity/se_list_curated_TODO.RData"))
 load(paste0(path, "results/netactivity/Metascore_TODO.RData"))
 load(paste0(path, "results/netactivity/Metascore_selected.RData"))
-load(paste0(path,  "results/PRS.RData"))
-load(paste0(path,  "results/PRS.RData"))
+load(paste0(path,  "results/PRS1.RData"))
+load(paste0(path,  "results/PRS2.RData"))
 
 Metascore_test_list_all[["fold_1"]][-3]
 Metascore_test_list_selected[["fold_1"]][-3]
@@ -36,7 +39,6 @@ metrics_summary_selected_long <- metrics_summary_selected %>%
   pivot_longer(cols = -c(Fold, Dataset), names_to = "Metric", values_to = "Value")
 
 # sacamos las metricas de los PRS
-prs_results<-prs_results[-5,] # quitamos el f score
 
 PRS_results_general_OR<-PRS_results_general[[1]]
 PRS_results_general_metrics<-PRS_results_general[[2]]
@@ -90,10 +92,10 @@ boxplot_compared<-ggplot(metrics_combined2, aes(x = Metric, y = Value, fill = Da
     fill = "Models",  
     color = "PRS"  
   ) +
-  coord_cartesian(ylim = c(0.15, 0.85)) + 
+  coord_cartesian(ylim = c(0, 1)) + 
   scale_fill_manual(
-    values = c("All tissues" = "#F8766D",
-               "Selected tissues" = "#00BFC4"),
+    values = c("All tissues" = "#E7B800",
+               "Selected tissues" = "#009E73"),
     breaks = c("All tissues",
                "Selected tissues")
   ) +
@@ -110,7 +112,13 @@ boxplot_compared<-ggplot(metrics_combined2, aes(x = Metric, y = Value, fill = Da
   plot.title = element_text(size = 16),
 )
 
-ggsave(paste0(path, "figures/metascore/boxplot_PRS_metascores.png"), plot = boxplot_compared, width = 9, height = 6, dpi = 400)
+
+label <- textGrob("B", x = unit(0, "npc"), just = "left", gp = gpar(fontsize = 15))
+
+# Arrange the label above the plot, aligned to the top-left
+combined_plot <-grid.arrange(arrangeGrob(label, boxplot_compared, ncol = 1, heights = c(1, 10)))
+
+ggsave(paste0(path, "figures/metascore/boxplot_PRS_metascores.png"), plot = as.ggplot(combined_plot), width = 9, height = 6, dpi = 400)
 
 # ahora representamos los folds y los odds ratio
 
@@ -127,7 +135,7 @@ for (fold in 1:5)
 }
 
 # meter los asteriscos tb  *<0.1 **<0.05 ***<0.01
-main_data_total_df<-data.frame()
+filtered_data<-data.frame()
 barplot_list<-list()
 
 for (fold in names(comparison_list))
@@ -151,7 +159,7 @@ for (fold in names(comparison_list))
   estimates_df$model<-rownames(estimates_df)
   estimates_df$complete_name<-paste0(rownames(estimates_df),"_", fold)
   rownames(estimates_df)<-NULL
-  main_data_total_df<-rbind(main_data_total_df,estimates_df)
+  filtered_data<-rbind(filtered_data,estimates_df)
 }
 
 
@@ -216,8 +224,8 @@ graph1 <-   ggplot(combined_data, aes(x = Odds_Ratio, y = complete_name, fill = 
        x = "Odds Ratio",
        y = "Models",
        fill = "Models") +
-  scale_fill_manual(values = c("Metascore_all" = "#F8766D",
-                               "Metascore_selected" = "#619CFF",
+  scale_fill_manual(values = c("Metascore_all" = "#E7B800",
+                               "Metascore_selected" = "#009E73",
                                "PGS004146" = "#C77CFF", 
                                "PGS000054" = "#7CAE00"),
                     labels = c("Metascore_all" = "All tissues",
@@ -250,4 +258,12 @@ graph1<-graph1 +
     na.rm = TRUE, 
     position = position_dodge(1)
     )
-ggsave(paste0(path, "figures/metascore/barplot_PRS_metascores.png"), plot = graph1, width = 9.5, height = 6, dpi = 400)
+
+
+label <- textGrob("A", x = unit(0, "npc"), just = "left", gp = gpar(fontsize = 15))
+
+# Arrange the label above the plot, aligned to the top-left
+combined_plot <-grid.arrange(arrangeGrob(label, graph1, ncol = 1, heights = c(1, 10)))
+
+
+ggsave(paste0(path, "figures/metascore/barplot_PRS_metascores.png"), plot = as.ggplot(combined_plot), width = 9, height = 6, dpi = 400)
